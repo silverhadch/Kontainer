@@ -1,0 +1,234 @@
+// Includes relevant modules used by the QML
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls as Controls
+import org.kde.kirigami as Kirigami
+import QtQuick.Dialogs
+
+// Import local components
+import "." as Local
+
+// Provides basic features needed for all kirigami applications
+Kirigami.ApplicationWindow {
+    // Unique identifier to reference this object
+    id: root
+
+    width: 600
+    height: 500
+
+    // Window title
+    title: "Kontainer"
+    
+    // Add a global action for creating a new container
+    globalDrawer: Kirigami.GlobalDrawer {
+        isMenu: true
+        actions: [
+            Kirigami.Action {
+                text: "Create Container"
+                icon.name: "list-add"
+                onTriggered: createDialog.open()
+            },
+            Kirigami.Action {
+                text: "Create distrobox shortcut"
+                icon.name: "document-new"
+                enabled: mainPage.containersList.length > 0
+                onTriggered: shortcutDialog.open()
+            },
+            Kirigami.Action {
+                separator: true
+            },
+            Kirigami.Action {
+                text: "Distrobox documentation"
+                icon.name: "help-contents"
+                onTriggered: Qt.openUrlExternally("https://distrobox.it/#distrobox")
+            },
+            Kirigami.Action {
+                text: "Distrobox useful tips"
+                icon.name: "help-hint"
+                onTriggered: Qt.openUrlExternally("https://github.com/89luca89/distrobox/blob/main/docs/useful_tips.md")
+            }
+        ]
+    }
+    
+    // Import dialog components
+    ErrorDialog {
+        id: errorDialog
+    }
+    
+    DistroboxRemoveDialog {
+        id: removeDialog
+    }
+    
+    DistroboxCreateDialog {
+        id: createDialog
+        errorDialog: errorDialog
+    }
+    
+    DistroboxShortcutDialog {
+        id: shortcutDialog
+        containersList: mainPage.containersList
+    }
+
+    FilePickerDialog {
+        id: packageFileDialog
+    }
+
+    // Set the first page that will be loaded when the app opens
+    // This can also be set to an id of a Kirigami.Page
+    pageStack.initialPage: Kirigami.Page {
+        id: mainPage
+        
+        property var containersList: []
+        
+        actions: [
+            Kirigami.Action {
+                text: "Create"
+                icon.name: "list-add"
+                onTriggered: createDialog.open()
+            },
+            Kirigami.Action {
+                text: "Refresh"
+                icon.name: "view-refresh"
+                onTriggered: {
+                    var result = distroBoxManager.listContainers()
+                    mainPage.containersList = JSON.parse(result)
+                }
+            }
+        ]
+        
+        Component.onCompleted: {
+            var result = distroBoxManager.listContainers()
+            console.log("Containers:", result)
+            mainPage.containersList = JSON.parse(result)
+        }
+        
+        ColumnLayout {
+            anchors.fill: parent
+            anchors.margins: Kirigami.Units.largeSpacing
+            spacing: Kirigami.Units.largeSpacing
+            
+            Kirigami.Heading {
+                Layout.alignment: Qt.AlignHCenter
+                text: "Distrobox Containers"
+                level: 2
+            }
+            
+            Kirigami.CardsListView {
+                id: containersListView
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                model: mainPage.containersList
+                
+                delegate: Kirigami.AbstractCard {
+                    contentItem: RowLayout {
+                        spacing: Kirigami.Units.smallSpacing
+                        
+                        Rectangle {
+                            width: Kirigami.Units.smallSpacing
+                            Layout.fillHeight: true
+                            color: distroBoxManager.getDistroColor(modelData.image)
+                            radius: 4
+                        }
+                        
+                        RowLayout {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            Layout.margins: Kirigami.Units.smallSpacing
+                            
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                spacing: 0
+                                
+                                Controls.Label {
+                                    text: modelData.name.charAt(0).toUpperCase() + modelData.name.slice(1)
+                                    Layout.fillWidth: true
+                                    elide: Text.ElideRight
+                                    font.bold: true
+                                }
+                                
+                                Controls.Label {
+                                    text: modelData.image
+                                    Layout.fillWidth: true
+                                    elide: Text.ElideRight
+                                    font.pointSize: theme.smallFont.pointSize
+                                    opacity: 0.7
+                                }
+                            }
+                            
+                            RowLayout {
+                                spacing: Kirigami.Units.smallSpacing
+
+                                Controls.Button {
+                                    icon.name: "delete"
+                                    icon.color: Kirigami.Theme.negativeTextColor
+                                    
+                                    Controls.ToolTip {
+                                        text: "Remove container"
+                                        visible: parent.hovered
+                                        delay: 500
+                                    }
+                                    
+                                    onClicked: {
+                                        removeDialog.containerName = modelData.name
+                                        removeDialog.open()
+                                    }
+                                }
+                                
+                                Controls.Button {
+                                    icon.name: "system-software-update"
+                                    
+                                    Controls.ToolTip {
+                                        text: "Upgrade container"
+                                        visible: parent.hovered
+                                        delay: 500
+                                    }
+                                    
+                                    onClicked: {
+                                        distroBoxManager.upgradeContainer(modelData.name)
+                                    }
+                                }
+                                
+                                Controls.Button {
+                                    icon.name: "install-symbolic"
+                                    
+                                    Controls.ToolTip {
+                                        text: "Install package file"
+                                        visible: parent.hovered
+                                        delay: 500
+                                    }
+                                    
+                                    onClicked: {
+                                        packageFileDialog.containerName = modelData.name
+                                        packageFileDialog.containerImage = modelData.image
+                                        packageFileDialog.open()
+                                    }
+                                }
+                                
+                                Controls.Button {
+                                    icon.name: "utilities-terminal-symbolic"
+                                    
+                                    Controls.ToolTip {
+                                        text: "Open terminal"
+                                        visible: parent.hovered
+                                        delay: 500
+                                    }
+                                    
+                                    onClicked: {
+                                        distroBoxManager.enterContainer(modelData.name)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                Controls.Label {
+                    anchors.centerIn: parent
+                    visible: containersListView.count === 0
+                    text: "No containers found"
+                    font.italic: true
+                }
+            }
+        }
+    }
+}

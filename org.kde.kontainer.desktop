@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Kontainer
+Exec=kontainer
+Icon=pattern-container
+Type=Application
+Terminal=false
+Categories=Utility

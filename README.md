@@ -1,0 +1,27 @@
+# Kontainer
+A simple Kirigami GUI for Distrobox
+
+![Kontainer](https://github.com/user-attachments/assets/219b68f0-f8f6-41c5-9a7c-9ef631e5354e)
+
+Functionalities:
+- Create, delete and upgrade distroboxes;
+- Open terminal inside distroboxes;
+- Create shortcut for distroboxes;
+- Install files inside distroboxes.
+
+<details>
+<summary>Screenshots</summary>
+
+Main view:
+![Screenshot_20250508_193522](https://github.com/user-attachments/assets/3d1204d9-18e0-4c0d-a188-cf8eb1c3adfd)
+
+Create Distrobox dialog:
+![Screenshot_20250508_193559](https://github.com/user-attachments/assets/61d1deb0-2ee8-47d4-b059-bbf301749e91)
+
+Create Distrobox shortcut dialog:
+![Screenshot_20250508_193616](https://github.com/user-attachments/assets/f5eb2268-ceba-451c-abe5-f6794de70ee0)
+
+Delete Distrobox dialog:
+![Screenshot_20250508_193644](https://github.com/user-attachments/assets/2fe98ce4-8898-4d3e-a793-021a4af1db4b)
+
+</details>

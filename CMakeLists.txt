@@ -31,6 +31,10 @@ ecm_find_qmlmodule(org.kde.kirigami REQUIRED)
 
 add_subdirectory(src)
 
+# Install desktop file
 install(PROGRAMS com.github.DenysMb.Kontainer.desktop DESTINATION ${KDE_INSTALL_APPDIR})
+
+# Install icon
+install(FILES src/assets/Kontainer.svg DESTINATION ${KDE_INSTALL_ICONDIR}/hicolor/scalable/apps)
 
 feature_summary(WHAT ALL INCLUDE_QUIET_PACKAGES FATAL_ON_MISSING_REQUIRED_PACKAGES)

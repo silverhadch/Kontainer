@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=Kontainer
 Exec=kontainer
-Icon=pattern-container
+Icon=Kontainer
 Type=Application
 Terminal=false
 Categories=Utility

@@ -150,7 +150,7 @@ Kirigami.ApplicationWindow {
                                     text: modelData.image
                                     Layout.fillWidth: true
                                     elide: Text.ElideRight
-                                    font.pointSize: theme.smallFont.pointSize
+                                    font.pointSize: Kirigami.Theme.smallFont.pointSize
                                     opacity: 0.7
                                 }
                             }

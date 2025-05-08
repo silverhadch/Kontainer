@@ -3,7 +3,12 @@ A simple Kirigami GUI for Distrobox
 
 ![Kontainer](https://github.com/user-attachments/assets/219b68f0-f8f6-41c5-9a7c-9ef631e5354e)
 
-Functionalities:
+### Requirements:
+Those are required even for Flatpak version:
+- Distrobox
+- Konsole
+
+### Functionalities:
 - Create, delete and upgrade distroboxes;
 - Open terminal inside distroboxes;
 - Create shortcut for distroboxes;

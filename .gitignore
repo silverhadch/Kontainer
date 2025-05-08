@@ -88,3 +88,4 @@ compile_commands.json
 # End of https://www.toptal.com/developers/gitignore/api/c++,qml,qt
 build/
 .vscode/
+.flatpak-builder/

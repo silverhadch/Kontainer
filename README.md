@@ -12,16 +12,9 @@ Functionalities:
 <details>
 <summary>Screenshots</summary>
 
-Main view:
 ![Screenshot_20250508_193522](https://github.com/user-attachments/assets/3d1204d9-18e0-4c0d-a188-cf8eb1c3adfd)
-
-Create Distrobox dialog:
 ![Screenshot_20250508_193559](https://github.com/user-attachments/assets/61d1deb0-2ee8-47d4-b059-bbf301749e91)
-
-Create Distrobox shortcut dialog:
 ![Screenshot_20250508_193616](https://github.com/user-attachments/assets/f5eb2268-ceba-451c-abe5-f6794de70ee0)
-
-Delete Distrobox dialog:
 ![Screenshot_20250508_193644](https://github.com/user-attachments/assets/2fe98ce4-8898-4d3e-a793-021a4af1db4b)
 
 </details>

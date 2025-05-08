@@ -6,6 +6,7 @@
 #include <QDir>
 #include <QRegularExpression>
 #include <QRandomGenerator>
+#include <QFile>
 
 // Constructor: Initializes the manager and populates available images lists
 DistroboxManager::DistroboxManager(QObject *parent)
@@ -19,9 +20,14 @@ DistroboxManager::DistroboxManager(QObject *parent)
 // Helper function to execute shell commands and capture their output
 QString DistroboxManager::runCommand(const QString &command, bool &success) const
 {
+    QString actualCommand = command;
+    if (isFlatpak() && command.startsWith(QStringLiteral("distrobox"))) {
+        actualCommand = QStringLiteral("flatpak-spawn --host ") + command;
+    }
+
     QProcess process;
     // Use sh -c to execute the command to support shell features like pipes
-    process.start(QStringLiteral("sh"), QStringList() << QLatin1String("-c") << command);
+    process.start(QStringLiteral("sh"), QStringList() << QLatin1String("-c") << actualCommand);
     process.waitForFinished();
     
     // Command is successful if it exits with code 0
@@ -280,4 +286,9 @@ bool DistroboxManager::installPackageInContainer(const QString &name, const QStr
     bool success;
     runCommand(command, success);
     return success;
+}
+
+bool DistroboxManager::isFlatpak() const
+{
+    return QFile::exists(QStringLiteral("/.flatpak-info"));
 }

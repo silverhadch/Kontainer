@@ -93,6 +93,12 @@ public Q_SLOTS:
      */
     bool installPackageInContainer(const QString &name, const QString &packagePath, const QString &image);
 
+    /**
+     * @brief Checks if the application is running as a Flatpak
+     * @return true if running as Flatpak, false otherwise
+     */
+    bool isFlatpak() const;
+
 private:
     QStringList m_availableImages;    ///< List of available container base images
     QStringList m_fullImageNames;     ///< List of full image names/URLs

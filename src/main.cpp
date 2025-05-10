@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
     QApplication::setOrganizationName(QStringLiteral("KDE"));
     QApplication::setOrganizationDomain(QStringLiteral("kde.org"));
     QApplication::setApplicationName(QStringLiteral("Kontainer"));
-    QApplication::setDesktopFileName(QStringLiteral("com.github.DenysMb.Kontainer"));
+    QApplication::setDesktopFileName(QStringLiteral("io.github.DenysMb.Kontainer"));
 
     QApplication::setStyle(QStringLiteral("breeze"));
     if (qEnvironmentVariableIsEmpty("QT_QUICK_CONTROLS_STYLE"))
@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty(QStringLiteral("distroBoxManager"), distroBoxManager);
 
     engine.rootContext()->setContextObject(new KLocalizedContext(&engine));
-    engine.loadFromModule("com.github.DenysMb.Kontainer", "Main");
+    engine.loadFromModule("io.github.DenysMb.Kontainer", "Main");
 
     if (engine.rootObjects().isEmpty())
     {

@@ -1,5 +1,5 @@
 {
-    "app-id": "com.github.DenysMb.Kontainer",
+    "app-id": "io.github.DenysMb.Kontainer",
     "runtime": "org.kde.Platform",
     "runtime-version": "6.9",
     "sdk": "org.kde.Sdk",

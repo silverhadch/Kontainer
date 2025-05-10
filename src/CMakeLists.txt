@@ -2,7 +2,7 @@ add_executable(kontainer)
 
 ecm_add_qml_module(kontainer
     URI
-    com.github.DenysMb.Kontainer
+    io.github.DenysMb.Kontainer
 )
 
 target_sources(kontainer

@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=Kontainer
 Exec=kontainer
-Icon=Kontainer
+Icon=io.github.DenysMb.Kontainer
 Type=Application
 Terminal=false
 Categories=Utility

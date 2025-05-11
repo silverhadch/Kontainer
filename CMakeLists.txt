@@ -35,6 +35,6 @@ add_subdirectory(src)
 install(PROGRAMS io.github.DenysMb.Kontainer.desktop DESTINATION ${KDE_INSTALL_APPDIR})
 
 # Install icon
-install(FILES src/assets/Kontainer.svg DESTINATION ${KDE_INSTALL_ICONDIR}/hicolor/scalable/apps)
+install(FILES src/assets/io.github.DenysMb.Kontainer.svg DESTINATION ${KDE_INSTALL_ICONDIR}/hicolor/scalable/apps)
 
 feature_summary(WHAT ALL INCLUDE_QUIET_PACKAGES FATAL_ON_MISSING_REQUIRED_PACKAGES)

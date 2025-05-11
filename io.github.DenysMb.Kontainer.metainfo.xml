@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.DenysMb.Kontainer</id>
+
+  <name>Kontainer</name>
+  <summary>A simple Kirigami GUI for Distrobox</summary>
+
+  <developer id="io.github.DenysMb">
+    <name>Denys Madureira</name>
+  </developer>
+
+  <launchable type="desktop-id">io.github.DenysMb.Kontainer.desktop</launchable>
+
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+
+  <description>
+    <p>
+      Kontainer is a graphical user interface (GUI) application built with KDE Kirigami that
+      provides a user-friendly way to manage Distrobox containers.
+    </p>
+    <p>
+      <em>Container Management</em>: Create new containers from various Linux distributions, delete
+      existing containers, upgrade containers and list and view all containers. </p>
+    <p>
+      <em>Terminal Integration</em>: Open terminal sessions inside containers using Konsole and
+      execute commands within containers. </p>
+    <p>
+      <em>Package Management</em>: Install package files inside containers and automatic detection
+      of appropriate package managers based on container distribution. </p>
+    <p>
+      <em>Desktop Integration</em>: Generate desktop shortcuts for containers, full integration with
+      the host system through Distrobox and color-coded container listing based on distribution. </p>
+  </description>
+
+  <screenshots>
+    <screenshot type="default">
+      <image>
+        https://private-user-images.githubusercontent.com/33737137/441893914-3d1204d9-18e0-4c0d-a188-cf8eb1c3adfd.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NDY5NTk0NzYsIm5iZiI6MTc0Njk1OTE3NiwicGF0aCI6Ii8zMzczNzEzNy80NDE4OTM5MTQtM2QxMjA0ZDktMThlMC00YzBkLWExODgtY2Y4ZWIxYzNhZGZkLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTA1MTElMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUwNTExVDEwMjYxNlomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTc1NGJlZDcxZTY2YTMzNDVmOTRiOTA1ZjI3ZjgyNjNlYzNmODJiOGIyODBmYjliODI4Yjg1NGU1NDAxNzI0NjYmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.F9Q1SHvgeNPjime3P2EuQAb3WGoGTPJ1rNM0h7j3ofo</image>
+    </screenshot>
+    <screenshot>
+      <image>
+        https://private-user-images.githubusercontent.com/33737137/441893956-61d1deb0-2ee8-47d4-b059-bbf301749e91.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NDY5NTk0NzYsIm5iZiI6MTc0Njk1OTE3NiwicGF0aCI6Ii8zMzczNzEzNy80NDE4OTM5NTYtNjFkMWRlYjAtMmVlOC00N2Q0LWIwNTktYmJmMzAxNzQ5ZTkxLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTA1MTElMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUwNTExVDEwMjYxNlomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTg2NDY4ZDRkMDc2MzUzNGVkOTlkZmIxY2VjZjg4MDdhMjFjNmU4MzNjNmQ0N2UyYmNkNGExNGJkOGE5MGM5NzgmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.xmy-XOU3h98TsWhCVE1vcpe8PvNa35XUn4cVHVdPxrs</image>
+    </screenshot>
+  </screenshots>
+
+  <releases>
+  <release version="1.0.0" date="2025-05-11">
+    <description>
+      <p>Initial release</p>
+    </description>
+  </release>
+</releases>
+</component>

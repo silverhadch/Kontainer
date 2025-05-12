@@ -17,19 +17,19 @@ Kirigami.ApplicationWindow {
     height: 500
 
     // Window title
-    title: "Kontainer"
+    title: i18n("Kontainer")
     
     // Add a global action for creating a new container
     globalDrawer: Kirigami.GlobalDrawer {
         isMenu: true
         actions: [
             Kirigami.Action {
-                text: "Create Container"
+                text: i18n("Create Container")
                 icon.name: "list-add"
                 onTriggered: createDialog.open()
             },
             Kirigami.Action {
-                text: "Create distrobox shortcut"
+                text: i18n("Create distrobox shortcut")
                 icon.name: "document-new"
                 enabled: mainPage.containersList.length > 0
                 onTriggered: shortcutDialog.open()
@@ -38,12 +38,12 @@ Kirigami.ApplicationWindow {
                 separator: true
             },
             Kirigami.Action {
-                text: "Distrobox documentation"
+                text: i18n("Distrobox documentation")
                 icon.name: "help-contents"
                 onTriggered: Qt.openUrlExternally("https://distrobox.it/#distrobox")
             },
             Kirigami.Action {
-                text: "Distrobox useful tips"
+                text: i18n("Distrobox useful tips")
                 icon.name: "help-hint"
                 onTriggered: Qt.openUrlExternally("https://github.com/89luca89/distrobox/blob/main/docs/useful_tips.md")
             }
@@ -82,12 +82,12 @@ Kirigami.ApplicationWindow {
         
         actions: [
             Kirigami.Action {
-                text: "Create"
+                text: i18n("Create")
                 icon.name: "list-add"
                 onTriggered: createDialog.open()
             },
             Kirigami.Action {
-                text: "Refresh"
+                text: i18n("Refresh")
                 icon.name: "view-refresh"
                 onTriggered: {
                     var result = distroBoxManager.listContainers()
@@ -109,7 +109,7 @@ Kirigami.ApplicationWindow {
             
             Kirigami.Heading {
                 Layout.alignment: Qt.AlignHCenter
-                text: "Distrobox Containers"
+                text: i18n("Distrobox Containers")
                 level: 2
             }
             
@@ -163,7 +163,7 @@ Kirigami.ApplicationWindow {
                                     icon.color: Kirigami.Theme.negativeTextColor
                                     
                                     Controls.ToolTip {
-                                        text: "Remove container"
+                                        text: i18n("Remove container")
                                         visible: parent.hovered
                                         delay: 500
                                     }
@@ -178,7 +178,7 @@ Kirigami.ApplicationWindow {
                                     icon.name: "system-software-update"
                                     
                                     Controls.ToolTip {
-                                        text: "Upgrade container"
+                                        text: i18n("Upgrade container")
                                         visible: parent.hovered
                                         delay: 500
                                     }
@@ -192,7 +192,7 @@ Kirigami.ApplicationWindow {
                                     icon.name: "install-symbolic"
                                     
                                     Controls.ToolTip {
-                                        text: "Install package file"
+                                        text: i18n("Install package file")
                                         visible: parent.hovered
                                         delay: 500
                                     }
@@ -208,7 +208,7 @@ Kirigami.ApplicationWindow {
                                     icon.name: "utilities-terminal-symbolic"
                                     
                                     Controls.ToolTip {
-                                        text: "Open terminal"
+                                        text: i18n("Open terminal")
                                         visible: parent.hovered
                                         delay: 500
                                     }
@@ -225,7 +225,7 @@ Kirigami.ApplicationWindow {
                 Controls.Label {
                     anchors.centerIn: parent
                     visible: containersListView.count === 0
-                    text: "No containers found"
+                    text: i18n("No containers found")
                     font.italic: true
                 }
             }

@@ -24,7 +24,7 @@ Kirigami.ApplicationWindow {
         isMenu: true
         actions: [
             Kirigami.Action {
-                text: i18n("Create Container")
+                text: i18n("Create container")
                 icon.name: "list-add"
                 onTriggered: createDialog.open()
             },
@@ -109,7 +109,7 @@ Kirigami.ApplicationWindow {
             
             Kirigami.Heading {
                 Layout.alignment: Qt.AlignHCenter
-                text: i18n("Distrobox Containers")
+                text: i18n("Distrobox containers")
                 level: 2
             }
             

@@ -5,7 +5,7 @@ import org.kde.kirigami as Kirigami
 
 Kirigami.Dialog {
     id: removeDialog
-    title: i18n("Remove Container")
+    title: i18n("Remove container")
     padding: Kirigami.Units.largeSpacing
     standardButtons: Kirigami.Dialog.Yes | Kirigami.Dialog.No
 
@@ -19,7 +19,7 @@ Kirigami.Dialog {
                 var result = distroBoxManager.listContainers()
                 mainPage.containersList = JSON.parse(result)
             } else {
-                errorDialog.text = i18n("Failed to remove container.")
+                errorDialog.text = i18n("Failed to remove container")
                 errorDialog.open()
             }
         }
@@ -42,7 +42,7 @@ Kirigami.Dialog {
         }
         
         Controls.Label {
-            text: i18n("This action cannot be undone.")
+            text: i18n("This action cannot be undone")
             Layout.fillWidth: true
             wrapMode: Text.Wrap
             font.italic: true

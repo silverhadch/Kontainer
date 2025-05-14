@@ -43,6 +43,7 @@
 # Cached binary representations of QML and JS files
 *.qmlc
 *.jsc
+.qmlls.ini
 
 ### Qt ###
 # C++ objects and libs

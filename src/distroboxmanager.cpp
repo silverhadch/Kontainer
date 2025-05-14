@@ -174,8 +174,8 @@ bool DistroboxManager::upgradeContainer(const QString &name)
     QString homeDir = QDir::homePath();
     // Run upgrade command and wait for user input before closing
     QString message = i18n("Press any key to close this terminal…");
-    QString upgradeCmd = u"distrobox upgrade %1; echo ''; echo '%2'; read -n 1"_s.arg(name, message);
-    QString command = u"konsole --workdir %1 -e bash -c '%2'"_s.arg(homeDir, upgradeCmd);
+    QString upgradeCmd = u"distrobox upgrade %1 && echo '' && echo '%2' && read -n 1"_s.arg(name, message);
+    QString command = u"konsole --workdir %1 -e bash -c \"%2\""_s.arg(homeDir, upgradeCmd);
 
     bool success;
     runCommand(command, success);
@@ -298,7 +298,7 @@ bool DistroboxManager::installPackageInContainer(const QString &name, const QStr
 
     // Run installation command in container and wait for user input before closing
     QString message = i18n("Press any key to close this terminal…");
-    QString fullCmd = u"distrobox enter %1 -- %2 && echo '' && echo '%3' && read -n 1"_s.arg(name, installCmd, message);
+    QString fullCmd = u"distrobox enter %1 -- bash -c \"%2 && echo '' && echo '%3' && read -n 1\""_s.arg(name, installCmd, message);
     QString command = u"konsole --workdir %1 -e bash -c \"%2\""_s.arg(homeDir, fullCmd);
 
     bool success;

@@ -41,11 +41,11 @@
   <screenshots>
     <screenshot type="default">
       <image>
-        https://i.imgur.com/POX0Z7D.png</image>
+        https://i.imgur.com/2VdJEpK.png</image>
     </screenshot>
     <screenshot>
       <image>
-        https://i.imgur.com/HFKIU7A.png</image>
+        https://i.imgur.com/ELWPNFY.png</image>
     </screenshot>
   </screenshots>
 
@@ -54,25 +54,33 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+    <release version="1.0.3" date="2025-05-14">
+      <description>
+        <p>
+          Added Dutch translation and updated UI.
+        </p>
+      </description>
+    </release>
+
     <release version="1.0.2" date="2025-05-13">
       <description>
         <p>Fixes a bug where the terminal was instantly closed after upgrading distrobox and
-          installing packages</p>
+          installing packages.</p>
         <p>
-          Update Kontainer's application launcher comment
+          Update Kontainer's application launcher comment.
         </p>
       </description>
     </release>
 
     <release version="1.0.1" date="2025-05-13">
       <description>
-        <p>Added translation support and portuguese translation</p>
+        <p>Added translation support and Portuguese translation.</p>
       </description>
     </release>
 
     <release version="1.0.0" date="2025-05-11">
       <description>
-        <p>Initial release</p>
+        <p>Initial release.</p>
       </description>
     </release>
   </releases>

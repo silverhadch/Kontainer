@@ -12,8 +12,22 @@ ecm_add_qml_module(kontainer
 target_sources(kontainer
     PRIVATE
     main.cpp
-    distroboxmanager.cpp
-    distroboxmanager.h
+    core/distroboxmanager.cpp
+    core/distroboxmanager.h
+    core/distroboxcli.cpp
+    core/distroboxcli.h
+    core/packageinstallcommand.cpp
+    core/packageinstallcommand.h
+    core/terminallauncher.cpp
+    core/terminallauncher.h
+    utils/distrocolors.cpp
+    utils/distrocolors.h
+)
+
+target_include_directories(kontainer
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/core
+    ${CMAKE_CURRENT_SOURCE_DIR}/utils
 )
 
 ecm_target_qml_sources(kontainer
@@ -37,6 +51,7 @@ target_link_libraries(kontainer
     KF6::I18n
     KF6::CoreAddons
     KF6::IconThemes
+    KF6::KIOGui
 )
 
 install(TARGETS kontainer ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})

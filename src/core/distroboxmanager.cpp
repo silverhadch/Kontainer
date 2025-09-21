@@ -414,12 +414,8 @@ QVariantList DistroboxManager::exportedApps(const QString &container)
     QStringList searchPaths;
 
     if (isFlatpakRuntime) {
-        // In Flatpak, search multiple possible locations for exported desktop files
-        searchPaths = {QDir::homePath() + QStringLiteral("/.var/app/io.github.DenysMb.Kontainer/data/applications"),
-                       QDir::homePath() + QStringLiteral("/.var/app/io.github.DenysMb.Kontainer/.local/share/applications"),
-                       QStringLiteral("/var/lib/flatpak/exports/share/applications"),
-                       QDir::homePath() + QStringLiteral("/.local/share/flatpak/exports/share/applications"),
-                       QDir::homePath() + QStringLiteral("/.local/share/applications")};
+        // Flatpak build only has read access to the host exports directory
+        searchPaths = {QDir::homePath() + QStringLiteral("/.local/share/applications")};
     } else {
         searchPaths = {QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation)};
     }
@@ -526,22 +522,22 @@ bool DistroboxManager::unexportApp(const QString &basename, const QString &conta
     qDebug() << "Output:" << output;
 
     // As a last resort, try to manually remove the desktop file
-    QString appsPath = QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation);
-    if (DistroboxCli::isFlatpak()) {
-        appsPath = QDir::homePath() + QStringLiteral("/.local/share/applications");
-    }
+    if (!DistroboxCli::isFlatpak()) {
+        QString appsPath = QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation);
+        QString desktopFileName = container + QLatin1String("-") + basename + QLatin1String(".desktop");
+        QFile desktopFile(appsPath + QLatin1String("/") + desktopFileName);
 
-    QString desktopFileName = container + QLatin1String("-") + basename + QLatin1String(".desktop");
-    QFile desktopFile(appsPath + QLatin1String("/") + desktopFileName);
-
-    if (desktopFile.exists()) {
-        qDebug() << "Attempting manual removal of:" << desktopFileName;
-        if (desktopFile.remove()) {
-            qDebug() << "Manual removal successful";
-            return true;
-        } else {
-            qDebug() << "Manual removal failed";
+        if (desktopFile.exists()) {
+            qDebug() << "Attempting manual removal of:" << desktopFileName;
+            if (desktopFile.remove()) {
+                qDebug() << "Manual removal successful";
+                return true;
+            } else {
+                qDebug() << "Manual removal failed";
+            }
         }
+    } else {
+        qDebug() << "Manual removal skipped: read-only access inside Flatpak runtime";
     }
 
     return false;

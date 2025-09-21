@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Kontainer 1.0.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-09-21 14:54+0100\n"
-"PO-Revision-Date: 2025-05-14 22:16+0100\n"
+"PO-Revision-Date: 2025-09-21 15:03+0100\n"
 "Last-Translator: Denys Madureira <denysmb@zoho.com>\n"
 "Language-Team: English <kde-i18n-doc@kde.org>\n"
 "Language: en_US\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Lokalize 25.04.1\n"
+"X-Generator: Lokalize 25.08.1\n"
 
 #: io.github.DenysMb.Kontainer.desktop:5 src/qml/Main.qml:26
 #, kde-format
@@ -86,7 +86,7 @@ msgstr "Autor"
 #: src/qml/ApplicationsWindow.qml:19
 #, kde-format
 msgid "Applications Management - %1"
-msgstr ""
+msgstr "Gerenciador de aplicações - %1"
 
 #: src/qml/ApplicationsWindow.qml:132 src/qml/Main.qml:134
 #, kde-format
@@ -96,40 +96,40 @@ msgstr "Atualizar"
 #: src/qml/ApplicationsWindow.qml:149
 #, kde-format
 msgid "Exported Applications (%1)"
-msgstr ""
+msgstr "Aplicações exportadas (%1)"
 
 #: src/qml/ApplicationsWindow.qml:157
 #, kde-format
 msgid "All Applications (%1)"
-msgstr ""
+msgstr "Todas aplicações (%1)"
 
 #: src/qml/ApplicationsWindow.qml:186
 #, kde-format
 msgid "Search exported applications..."
-msgstr ""
+msgstr "Procure por aplicações exportadas..."
 
 #: src/qml/ApplicationsWindow.qml:220
 #, kde-format
 msgid "Search available applications..."
-msgstr ""
+msgstr "Procure por aplicações disponíveis..."
 
 #: src/qml/ApplicationsWindow.qml:247
 #, kde-format
 msgid "No exported applications found matching '%1'"
-msgstr ""
+msgstr "Nenhuma aplicação exportada encontrada correspondendo a '%1'"
 
 #: src/qml/ApplicationsWindow.qml:247
 #, kde-format
 msgid "No exported applications found"
-msgstr ""
+msgstr "Nenhuma aplicação exportada encontrada"
 
 #: src/qml/ApplicationsWindow.qml:254
 #, kde-format
 msgid "No applications found matching '%1'"
-msgstr ""
+msgstr "Nenhuma aplicação encontrada correspondendo a '%1'"
 
 #: src/qml/ApplicationsWindow.qml:254
-#, fuzzy, kde-format
+#, kde-format
 msgid "No applications found in container"
 msgstr "Nenhum container encontrado. Criar um novo container agora?"
 
@@ -139,51 +139,53 @@ msgid ""
 "This container might not have desktop applications installed or they might "
 "not be detectable."
 msgstr ""
+"Esse container pode não ter aplicações desktop instaladas or eles podem "
+"não ser detectáveis."
 
 #: src/qml/ApplicationsWindow.qml:296 src/qml/ApplicationsWindow.qml:356
 #, kde-format
 msgid "Unexport"
-msgstr ""
+msgstr "Remover exportação"
 
 #: src/qml/ApplicationsWindow.qml:307 src/qml/ApplicationsWindow.qml:372
-#, fuzzy, kde-format
+#, kde-format
 msgid "Failed to unexport application"
 msgstr "Falha ao remover container"
 
 #: src/qml/ApplicationsWindow.qml:356
 #, kde-format
 msgid "Export"
-msgstr ""
+msgstr "Exportar"
 
 #: src/qml/ApplicationsWindow.qml:372
-#, fuzzy, kde-format
+#, kde-format
 msgid "Failed to export application"
 msgstr "Falha ao remover container"
 
 #: src/qml/ApplicationsWindow.qml:389
 #, kde-format
 msgid "%1 selected"
-msgstr ""
+msgstr "%1 selecionado"
 
 #: src/qml/ApplicationsWindow.qml:395
 #, kde-format
 msgid "Unexport Selected"
-msgstr ""
+msgstr "Remover exportação"
 
 #: src/qml/ApplicationsWindow.qml:395
 #, kde-format
 msgid "Export Selected"
-msgstr ""
+msgstr "Exportar selecionado"
 
 #: src/qml/ApplicationsWindow.qml:410
 #, kde-format
 msgid "%1 applications"
-msgstr ""
+msgstr "%1 aplicações"
 
 #: src/qml/ApplicationsWindow.qml:422
 #, kde-format
 msgid "Clear Selection"
-msgstr ""
+msgstr "Limpar seleção"
 
 #: src/qml/DistroboxCreateDialog.qml:15
 #, kde-format
@@ -333,7 +335,7 @@ msgstr "Criar..."
 #: src/qml/Main.qml:129
 #, kde-format
 msgid "Upgrade all…"
-msgstr ""
+msgstr "Atualizar todos..."
 
 #: src/qml/Main.qml:204
 #, kde-format
@@ -353,7 +355,7 @@ msgstr "Instalar arquivo"
 #: src/qml/Main.qml:228
 #, kde-format
 msgid "Manage Applications"
-msgstr ""
+msgstr "Gerenciar aplicações"
 
 #: src/qml/Main.qml:243
 #, kde-format

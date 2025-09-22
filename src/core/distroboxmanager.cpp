@@ -19,6 +19,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QHash>
+#include <QPointer>
 #include <QRegularExpression>
 #include <QSettings>
 #include <QStandardPaths>
@@ -243,6 +244,24 @@ bool DistroboxManager::removeContainer(const QString &name)
     return success;
 }
 
+// Clone Container to container-clone, genius i know
+bool DistroboxManager::cloneContainer(const QString &name)
+{
+    QString message = i18n("Press any key to close this terminal…");
+    QString cloneCmd = u"distrobox-stop %1 -Y && distrobox create --clone %1 --name %1-clone && echo '' && echo '%2' && read -s -n 1"_s.arg(name, message);
+    QString command = u"/usr/bin/env bash -c \"%1\""_s.arg(cloneCmd);
+    const QString clonedName = name + QStringLiteral("-clone");
+    QPointer<DistroboxManager> self(this);
+    auto callback = [self, clonedName](bool success) {
+        if (!self) {
+            return;
+        }
+        Q_EMIT self->containerCloneFinished(clonedName, success);
+    };
+
+    return launchCommandInTerminal(command, QDir::homePath(), callback);
+}
+
 // Upgrades all packages in a container
 bool DistroboxManager::upgradeContainer(const QString &name)
 {
@@ -262,9 +281,9 @@ bool DistroboxManager::upgradeAllContainer()
     return launchCommandInTerminal(command);
 }
 
-bool DistroboxManager::launchCommandInTerminal(const QString &command, const QString &workingDirectory)
+bool DistroboxManager::launchCommandInTerminal(const QString &command, const QString &workingDirectory, const std::function<void(bool)> &onFinished)
 {
-    return TerminalLauncher::launch(command, workingDirectory, this);
+    return TerminalLauncher::launch(command, workingDirectory, this, onFinished);
 }
 
 // Returns a color associated with the distribution for UI purposes
@@ -423,7 +442,6 @@ QVariantList DistroboxManager::exportedApps(const QString &container)
     QStringList patterns;
     patterns << QStringLiteral("%1-*.desktop").arg(container);
 
-    // Search in all possible paths
     for (const QString &searchPath : searchPaths) {
         QDir dir(searchPath);
         if (!dir.exists()) {
@@ -433,6 +451,12 @@ QVariantList DistroboxManager::exportedApps(const QString &container)
         for (const QFileInfo &file : dir.entryInfoList(patterns, QDir::Files)) {
             QString fileName = file.fileName();
             if (!fileName.endsWith(QStringLiteral(".desktop"))) {
+                continue;
+            }
+
+            // Skip clone files explicitly
+            if (fileName.endsWith(QStringLiteral("clone.desktop"), Qt::CaseInsensitive)
+                || fileName.contains(QStringLiteral("-clone.desktop"), Qt::CaseInsensitive)) {
                 continue;
             }
 
@@ -446,7 +470,7 @@ QVariantList DistroboxManager::exportedApps(const QString &container)
                 basename.chop(8);
             }
 
-            // Skip if we already found this app (avoid duplicates from multiple paths)
+            // Skip if we already found this app
             bool alreadyExists = false;
             for (const QVariant &existingApp : list) {
                 QVariantMap existingMap = existingApp.toMap();

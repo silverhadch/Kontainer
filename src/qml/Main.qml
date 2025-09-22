@@ -1,13 +1,8 @@
 /*
-    SPDX-License-Identifier: GPL-3.0-or-later
-    SPDX-FileCopyrightText: 2025 Denys Madureira <denysmb@zoho.com>
-    SPDX-FileCopyrightText: 2025 Thomas Duckworth <tduck@filotimoproject.org>
-*/
-
-/*
  *   SPDX-License-Identifier: GPL-3.0-or-later
  *   SPDX-FileCopyrightText: 2025 Denys Madureira <denysmb@zoho.com>
  *   SPDX-FileCopyrightText: 2025 Thomas Duckworth <tduck@filotimoproject.org>
+ *   SPDX-FileCopyrightText: 2025 Hadi Chokr <hadichokr@icloud.com>
  */
 
 import QtQuick
@@ -37,6 +32,15 @@ Kirigami.ApplicationWindow {
         var result = distroBoxManager.listContainers();
         mainPage.containersList = JSON.parse(result);
         refreshing = false;
+    }
+
+    Connections {
+        target: distroBoxManager
+        function onContainerCloneFinished(clonedName, success) {
+            if (success) {
+                refresh();
+            }
+        }
     }
 
     globalDrawer: Kirigami.GlobalDrawer {
@@ -193,27 +197,11 @@ Kirigami.ApplicationWindow {
 
                                 Layout.fillWidth: true
                                 spacing: Kirigami.Units.smallSpacing
-
                                 alignment: Qt.AlignRight
                                 display: Controls.Button.IconOnly
                                 flat: false
 
                                 actions: [
-                                    Kirigami.Action {
-                                        icon.name: "delete"
-                                        text: i18n("Remove Container")
-                                        onTriggered: {
-                                            removeDialog.containerName = modelData.name;
-                                            removeDialog.open();
-                                        }
-                                    },
-                                    Kirigami.Action {
-                                        icon.name: "system-software-update"
-                                        text: i18n("Upgrade Container")
-                                        onTriggered: {
-                                            distroBoxManager.upgradeContainer(modelData.name);
-                                        }
-                                    },
                                     Kirigami.Action {
                                         icon.name: "package-x-generic"
                                         text: i18n("Install Package")
@@ -224,7 +212,7 @@ Kirigami.ApplicationWindow {
                                         }
                                     },
                                     Kirigami.Action {
-                                        icon.name: "applications-other-symbolic"
+                                        icon.name: "applications-all-symbolic"
                                         text: i18n("Manage Applications")
                                         onTriggered: {
                                             var component = Qt.createComponent("ApplicationsWindow.qml");
@@ -244,6 +232,32 @@ Kirigami.ApplicationWindow {
                                         onTriggered: {
                                             distroBoxManager.enterContainer(modelData.name);
                                         }
+                                    },
+                                    Kirigami.Action {
+                                        text: i18n("More options")
+                                        icon.name: "view-more-symbolic"
+                                        Kirigami.Action {
+                                            icon.name: "system-software-update"
+                                            text: i18n("Upgrade Container")
+                                            onTriggered: {
+                                                distroBoxManager.upgradeContainer(modelData.name);
+                                            }
+                                        }
+                                        Kirigami.Action {
+                                            icon.name: "edit-copy"
+                                            text: i18n("Clone Container")
+                                            onTriggered: {
+                                                distroBoxManager.cloneContainer(modelData.name);
+                                            }
+                                        }
+                                        Kirigami.Action {
+                                            icon.name: "delete"
+                                            text: i18n("Remove Container")
+                                            onTriggered: {
+                                                removeDialog.containerName = modelData.name;
+                                                removeDialog.open();
+                                            }
+                                        }
                                     }
                                 ]
                             }
@@ -262,17 +276,14 @@ Kirigami.ApplicationWindow {
                     }
                 }
 
-                // Since the UI thread isn't blocked by runCommand anymore, this shows on refresh
-                // that the distroboxes are being loaded -- rather than freezing the application.
                 Controls.BusyIndicator {
                     anchors.centerIn: parent
                     visible: containersListView.count === 0 && refreshing && !loadingTimer.running
                 }
 
-                // Avoids flickering when distroboxes load quickly.
                 Timer {
                     id: loadingTimer
-                    interval: 100 // 100ms
+                    interval: 100
                     repeat: false
                 }
 

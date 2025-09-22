@@ -39,14 +39,13 @@ Kirigami.Dialog {
             if (trimmed.length === 0) {
                 filteredImages = availableImages.slice();
             } else {
-                filteredImages = availableImages.filter(function(image) {
-                    return image.display.toLowerCase().includes(trimmed)
-                        || image.full.toLowerCase().includes(trimmed);
+                filteredImages = availableImages.filter(function (image) {
+                    return image.display.toLowerCase().includes(trimmed) || image.full.toLowerCase().includes(trimmed);
                 });
             }
 
             if (filteredImages.length > 0) {
-                var match = filteredImages.find(function(image) {
+                var match = filteredImages.find(function (image) {
                     return image.full === selectedImageFull;
                 });
 
@@ -63,7 +62,7 @@ Kirigami.Dialog {
         }
 
         if (typeof imageListView !== "undefined" && imageListView) {
-            var targetIndex = filteredImages.findIndex(function(image) {
+            var targetIndex = filteredImages.findIndex(function (image) {
                 return image.full === selectedImageFull;
             });
             imageListView.currentIndex = targetIndex;
@@ -120,6 +119,7 @@ Kirigami.Dialog {
     onRejected: {
         createDialog.close();
         createDialog.selectingImage = false;
+        createDialog.standardButtons = Kirigami.Dialog.Ok | Kirigami.Dialog.Cancel;
     }
 
     Component.onCompleted: {
@@ -161,6 +161,7 @@ Kirigami.Dialog {
                         enabled: !createDialog.isCreating
                         onClicked: {
                             createDialog.selectingImage = true;
+                            createDialog.standardButtons = Kirigami.Dialog.NoButton;
                             if (imageSearchField) {
                                 imageSearchField.text = createDialog.imageSearchQuery;
                                 imageSearchField.forceActiveFocus();
@@ -171,8 +172,7 @@ Kirigami.Dialog {
 
                     Controls.Label {
                         Layout.fillWidth: true
-                        visible: createDialog.selectedImageFull.length > 0
-                                 && createDialog.selectedImageFull !== createDialog.selectedImageDisplay
+                        visible: createDialog.selectedImageFull.length > 0 && createDialog.selectedImageFull !== createDialog.selectedImageDisplay
                         text: createDialog.selectedImageFull
                         wrapMode: Text.Wrap
                         color: Kirigami.Theme.disabledTextColor
@@ -271,12 +271,13 @@ Kirigami.Dialog {
                         createDialog.selectedImageDisplay = modelData.display;
                         imageListView.currentIndex = index;
                         createDialog.selectingImage = false;
+                        createDialog.standardButtons = Kirigami.Dialog.Ok | Kirigami.Dialog.Cancel;
                         if (imageSearchField && imageSearchField.text.length > 0) {
-                            Qt.callLater(function() {
+                            Qt.callLater(function () {
                                 imageSearchField.text = "";
                             });
                         } else {
-                            Qt.callLater(function() {
+                            Qt.callLater(function () {
                                 updateFilteredImages("");
                             });
                         }

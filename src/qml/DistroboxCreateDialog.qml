@@ -12,7 +12,7 @@ import org.kde.kirigami as Kirigami
 
 Kirigami.Dialog {
     id: createDialog
-    title: i18n("Create new container")
+    title: selectingImage ? i18n("Select image") : i18n("Create new container")
     padding: Kirigami.Units.largeSpacing
     standardButtons: Kirigami.Dialog.Ok | Kirigami.Dialog.Cancel
 

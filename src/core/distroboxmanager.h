@@ -191,6 +191,14 @@ private:
     QStringList m_fullImageNames; ///< List of full image names/URLs
 
     /**
+     * @brief Checks if an application with the given basename is exported by other containers
+     * @param basename Basename of the application to check
+     * @param excludeContainer Container to exclude from the check
+     * @return true if the app is exported by other containers, false otherwise
+     */
+    bool isAppExportedByOtherContainers(const QString &basename, const QString &excludeContainer);
+
+    /**
      * @brief Launches a command in a terminal window
      * @param command Command to execute
      * @param workingDirectory Directory to start the terminal in (optional)

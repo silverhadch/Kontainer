@@ -521,55 +521,177 @@ bool DistroboxManager::exportApp(const QString &basename, const QString &contain
     return success;
 }
 
-bool DistroboxManager::unexportApp(const QString &basename, const QString &container)
+bool DistroboxManager::isAppExportedByOtherContainers(const QString &basename, const QString &excludeContainer)
 {
-    qDebug() << "Attempting to unexport:" << basename << "from:" << container;
+    qDebug() << "Checking if" << basename << "is exported by containers other than" << excludeContainer;
 
-    // First try with just the basename (how distrobox-export expects it)
-    QString command = u"distrobox enter %1 -- distrobox-export --app %2 --delete"_s.arg(KShell::quoteArg(container), KShell::quoteArg(basename));
+    bool isFlatpakRuntime = DistroboxCli::isFlatpak();
+    QStringList searchPaths;
 
-    bool success;
-    QString output = DistroboxCli::runCommand(command, success);
-
-    if (success) {
-        qDebug() << "Unexport successful with basename:" << basename;
-        return true;
+    if (isFlatpakRuntime) {
+        searchPaths = {QDir::homePath() + QStringLiteral("/.local/share/applications")};
+    } else {
+        searchPaths = {QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation)};
     }
 
-    qDebug() << "First attempt failed, trying with full path...";
+    qDebug() << "Searching in paths:" << searchPaths;
 
-    // If that fails, try with the full path
-    QString desktopPath = QStringLiteral("/usr/share/applications/") + basename + QStringLiteral(".desktop");
-    QString altCommand = u"distrobox enter %1 -- distrobox-export --app %2 --delete"_s.arg(KShell::quoteArg(container), KShell::quoteArg(desktopPath));
+    for (const QString &searchPath : searchPaths) {
+        QDir dir(searchPath);
+        if (!dir.exists()) {
+            qDebug() << "Search path does not exist:" << searchPath;
+            continue;
+        }
 
-    output = DistroboxCli::runCommand(altCommand, success);
+        // Look for any desktop files that match the pattern *-{basename}.desktop
+        // but exclude the specific container we're checking against
+        QStringList nameFilters;
+        nameFilters << QStringLiteral("*-%1.desktop").arg(basename);
 
-    if (success) {
-        qDebug() << "Unexport successful with full path:" << desktopPath;
-        return true;
-    }
+        qDebug() << "Looking for files matching pattern:" << nameFilters << "in" << searchPath;
 
-    qDebug() << "All unexport attempts failed for:" << basename;
-    qDebug() << "Output:" << output;
+        QFileInfoList matchingFiles = dir.entryInfoList(nameFilters, QDir::Files);
+        qDebug() << "Found" << matchingFiles.size() << "matching files";
 
-    // As a last resort, try to manually remove the desktop file
-    if (!DistroboxCli::isFlatpak()) {
-        QString appsPath = QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation);
-        QString desktopFileName = container + QLatin1String("-") + basename + QLatin1String(".desktop");
-        QFile desktopFile(appsPath + QLatin1String("/") + desktopFileName);
+        for (const QFileInfo &file : matchingFiles) {
+            QString fileName = file.fileName();
+            qDebug() << "Examining file:" << fileName;
 
-        if (desktopFile.exists()) {
-            qDebug() << "Attempting manual removal of:" << desktopFileName;
-            if (desktopFile.remove()) {
-                qDebug() << "Manual removal successful";
+            // Skip clone files
+            if (fileName.endsWith(QStringLiteral("clone.desktop"), Qt::CaseInsensitive)
+                || fileName.contains(QStringLiteral("-clone.desktop"), Qt::CaseInsensitive)) {
+                qDebug() << "Skipping clone file:" << fileName;
+                continue;
+            }
+
+            // Extract container name from filename (format: container-basename.desktop)
+            QString containerFromFile = fileName;
+            containerFromFile.remove(QStringLiteral("-%1.desktop").arg(basename));
+
+            qDebug() << "Extracted container name:" << containerFromFile << "from file:" << fileName;
+
+            // If this file belongs to a different container, the app is exported by others
+            if (containerFromFile != excludeContainer) {
+                qDebug() << "Found" << basename << "exported by another container:" << containerFromFile;
                 return true;
-            } else {
-                qDebug() << "Manual removal failed";
             }
         }
-    } else {
-        qDebug() << "Manual removal skipped: read-only access inside Flatpak runtime";
     }
 
+    qDebug() << "No other containers found exporting" << basename;
     return false;
+}
+
+bool DistroboxManager::unexportApp(const QString &basename, const QString &container)
+{
+    qDebug() << "=== UNEXPORT OPERATION START ===";
+    qDebug() << "Attempting to unexport:" << basename << "from container:" << container;
+
+    // Check if this app is exported by other containers
+    qDebug() << "Checking if app is exported by other containers...";
+    bool exportedByOthers = isAppExportedByOtherContainers(basename, container);
+
+    if (exportedByOthers) {
+        qDebug() << "DECISION: App" << basename << "is exported by other containers";
+        qDebug() << "STRATEGY: Using manual file removal only (preserving shared icons/metadata)";
+
+        // Only remove the specific container's desktop file, don't use distrobox-export --delete
+        // which might remove shared icons/metadata
+        if (!DistroboxCli::isFlatpak()) {
+            QString appsPath = QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation);
+            QString desktopFileName = container + QLatin1String("-") + basename + QLatin1String(".desktop");
+            QString fullDesktopPath = appsPath + QLatin1String("/") + desktopFileName;
+            QFile desktopFile(fullDesktopPath);
+
+            qDebug() << "Target desktop file:" << fullDesktopPath;
+            qDebug() << "Desktop file exists:" << desktopFile.exists();
+
+            if (desktopFile.exists()) {
+                qDebug() << "Attempting manual removal of desktop file:" << desktopFileName;
+                if (desktopFile.remove()) {
+                    qDebug() << "SUCCESS: Manual removal completed successfully";
+                    qDebug() << "=== UNEXPORT OPERATION END (SUCCESS) ===";
+                    return true;
+                } else {
+                    qDebug() << "FAILURE: Manual removal failed - could not delete file";
+                    qDebug() << "=== UNEXPORT OPERATION END (FAILED) ===";
+                    return false;
+                }
+            } else {
+                qDebug() << "FAILURE: Desktop file does not exist:" << desktopFileName;
+                qDebug() << "=== UNEXPORT OPERATION END (FAILED) ===";
+                return false;
+            }
+        } else {
+            qDebug() << "FAILURE: Manual removal skipped - read-only access inside Flatpak runtime";
+            qDebug() << "=== UNEXPORT OPERATION END (FAILED) ===";
+            return false;
+        }
+    } else {
+        qDebug() << "DECISION: App" << basename << "is only exported by this container";
+        qDebug() << "STRATEGY: Safe to use distrobox-export --delete (will remove icons/metadata)";
+
+        // First try with just the basename (how distrobox-export expects it)
+        QString command = u"distrobox enter %1 -- distrobox-export --app %2 --delete"_s.arg(KShell::quoteArg(container), KShell::quoteArg(basename));
+        qDebug() << "Executing command:" << command;
+
+        bool success;
+        QString output = DistroboxCli::runCommand(command, success);
+        qDebug() << "Command result - Success:" << success << "Output:" << output;
+
+        if (success) {
+            qDebug() << "SUCCESS: Unexport successful with basename approach";
+            qDebug() << "=== UNEXPORT OPERATION END (SUCCESS) ===";
+            return true;
+        }
+
+        qDebug() << "First attempt failed, trying with full path approach...";
+
+        // If that fails, try with the full path
+        QString desktopPath = QStringLiteral("/usr/share/applications/") + basename + QStringLiteral(".desktop");
+        QString altCommand = u"distrobox enter %1 -- distrobox-export --app %2 --delete"_s.arg(KShell::quoteArg(container), KShell::quoteArg(desktopPath));
+        qDebug() << "Executing alternative command:" << altCommand;
+
+        output = DistroboxCli::runCommand(altCommand, success);
+        qDebug() << "Alternative command result - Success:" << success << "Output:" << output;
+
+        if (success) {
+            qDebug() << "SUCCESS: Unexport successful with full path approach";
+            qDebug() << "=== UNEXPORT OPERATION END (SUCCESS) ===";
+            return true;
+        }
+
+        qDebug() << "Both distrobox-export attempts failed, falling back to manual removal";
+        qDebug() << "Final command output:" << output;
+
+        // As a last resort, try to manually remove the desktop file
+        if (!DistroboxCli::isFlatpak()) {
+            QString appsPath = QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation);
+            QString desktopFileName = container + QLatin1String("-") + basename + QLatin1String(".desktop");
+            QString fullDesktopPath = appsPath + QLatin1String("/") + desktopFileName;
+            QFile desktopFile(fullDesktopPath);
+
+            qDebug() << "Fallback: Target desktop file:" << fullDesktopPath;
+            qDebug() << "Fallback: Desktop file exists:" << desktopFile.exists();
+
+            if (desktopFile.exists()) {
+                qDebug() << "Fallback: Attempting manual removal of:" << desktopFileName;
+                if (desktopFile.remove()) {
+                    qDebug() << "SUCCESS: Fallback manual removal successful";
+                    qDebug() << "=== UNEXPORT OPERATION END (SUCCESS) ===";
+                    return true;
+                } else {
+                    qDebug() << "FAILURE: Fallback manual removal failed";
+                }
+            } else {
+                qDebug() << "FAILURE: Fallback - desktop file does not exist";
+            }
+        } else {
+            qDebug() << "Fallback: Manual removal skipped - read-only access inside Flatpak runtime";
+        }
+
+        qDebug() << "FAILURE: All unexport attempts exhausted";
+        qDebug() << "=== UNEXPORT OPERATION END (FAILED) ===";
+        return false;
+    }
 }

@@ -244,19 +244,26 @@ bool DistroboxManager::removeContainer(const QString &name)
     return success;
 }
 
-// Clone Container to container-clone, genius i know
-bool DistroboxManager::cloneContainer(const QString &name)
+// Clone a container to a user-provided name
+bool DistroboxManager::cloneContainer(const QString &sourceName, const QString &cloneName)
 {
+    const QString trimmedSource = sourceName.trimmed();
+    const QString trimmedClone = cloneName.trimmed();
+
+    if (trimmedSource.isEmpty() || trimmedClone.isEmpty()) {
+        return false;
+    }
+
     QString message = i18n("Press any key to close this terminal…");
-    QString cloneCmd = u"distrobox-stop %1 -Y && distrobox create --clone %1 --name %1-clone && echo '' && echo '%2' && read -s -n 1"_s.arg(name, message);
+    QString cloneCmd =
+        u"distrobox-stop %1 -Y && distrobox create --clone %1 --name %2 && echo '' && echo '%3' && read -s -n 1"_s.arg(trimmedSource, trimmedClone, message);
     QString command = u"/usr/bin/env bash -c \"%1\""_s.arg(cloneCmd);
-    const QString clonedName = name + QStringLiteral("-clone");
     QPointer<DistroboxManager> self(this);
-    auto callback = [self, clonedName](bool success) {
+    auto callback = [self, trimmedClone](bool success) {
         if (!self) {
             return;
         }
-        Q_EMIT self->containerCloneFinished(clonedName, success);
+        Q_EMIT self->containerCloneFinished(trimmedClone, success);
     };
 
     return launchCommandInTerminal(command, QDir::homePath(), callback);

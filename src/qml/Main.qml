@@ -58,6 +58,12 @@ Kirigami.ApplicationWindow {
                 onTriggered: shortcutDialog.open()
             },
             Kirigami.Action {
+                text: i18n("Clone Container…")
+                icon.name: "edit-copy"
+                enabled: mainPage.containersList.length > 0
+                onTriggered: cloneDialog.openWithContainer("")
+            },
+            Kirigami.Action {
                 separator: true
             },
             Kirigami.Action {
@@ -100,6 +106,11 @@ Kirigami.ApplicationWindow {
 
     DistroboxShortcutDialog {
         id: shortcutDialog
+        containersList: mainPage.containersList
+    }
+
+    DistroboxCloneDialog {
+        id: cloneDialog
         containersList: mainPage.containersList
     }
 
@@ -247,7 +258,7 @@ Kirigami.ApplicationWindow {
                                             icon.name: "edit-copy"
                                             text: i18n("Clone Container")
                                             onTriggered: {
-                                                distroBoxManager.cloneContainer(modelData.name);
+                                                cloneDialog.openWithContainer(modelData.name);
                                             }
                                         }
                                         Kirigami.Action {

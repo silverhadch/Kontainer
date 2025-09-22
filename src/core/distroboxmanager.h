@@ -107,10 +107,11 @@ public Q_SLOTS:
 
     /**
      * @brief Clones an existing Distrobox container
-     * @param name Name of the container to clone
+     * @param sourceName Name of the container to clone
+     * @param cloneName Name that should be assigned to the cloned container
      * @return true if the cloning process was successful, false otherwise
      */
-    bool cloneContainer(const QString &name);
+    bool cloneContainer(const QString &sourceName, const QString &cloneName);
 
     /**
      * @brief Upgrades packages in all containers

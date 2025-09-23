@@ -14,6 +14,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as Controls
 import QtQuick.Dialogs
+import QtCore
 
 import org.kde.kirigami as Kirigami
 
@@ -31,7 +32,16 @@ Kirigami.ApplicationWindow {
     }
 
     property bool refreshing: false
-    property bool fallbackToDistroColors: false
+
+    // persistent settings storage using QtCore.Settings
+    Settings {
+        id: kontainerSettings
+        category: "Appearance"
+        property bool showColors: false
+    }
+
+    // use the setting instead of a volatile property
+    property alias fallbackToDistroColors: kontainerSettings.showColors
 
     function refresh() {
         refreshing = true;
@@ -54,19 +64,23 @@ Kirigami.ApplicationWindow {
                 enabled: mainPage.containersList.length > 0
                 onTriggered: shortcutDialog.open()
             },
+            Kirigami.Action { separator: true },
+
+            // clearer toggle action
             Kirigami.Action {
-                separator: true
-            },
-            Kirigami.Action {
-                text: root.fallbackToDistroColors ? i18n("Use Icons") : i18n("Use Colors")
-                icon.name: root.fallbackToDistroColors ? "preferences-desktop-icons" : "preferences-desktop-color"
+                text: root.fallbackToDistroColors
+                ? i18n("Show Container Icons")
+                : i18n("Show Container Colors")
+                icon.name: root.fallbackToDistroColors
+                ? "preferences-desktop-icons"
+                : "preferences-desktop-color"
                 onTriggered: {
-                    root.fallbackToDistroColors = !root.fallbackToDistroColors;
+                    root.fallbackToDistroColors = !root.fallbackToDistroColors
                 }
             },
-            Kirigami.Action {
-                separator: true
-            },
+
+            Kirigami.Action { separator: true },
+
             Kirigami.Action {
                 text: i18n("Open Distrobox Documentation")
                 icon.name: "help-contents"
@@ -77,42 +91,24 @@ Kirigami.ApplicationWindow {
                 icon.name: "help-hint"
                 onTriggered: Qt.openUrlExternally("https://github.com/89luca89/distrobox/blob/main/docs/useful_tips.md")
             },
-            Kirigami.Action {
-                separator: true
-            },
+            Kirigami.Action { separator: true },
             Kirigami.Action {
                 text: i18n("About Kontainer")
                 icon.name: "io.github.DenysMb.Kontainer"
                 onTriggered: {
                     if (root.pageStack.layers.currentItem !== aboutPage) {
-                        root.pageStack.layers.push(aboutPage);
+                        root.pageStack.layers.push(aboutPage)
                     }
                 }
             }
         ]
     }
 
-    ErrorDialog {
-        id: errorDialog
-    }
-
-    DistroboxRemoveDialog {
-        id: removeDialog
-    }
-
-    DistroboxCreateDialog {
-        id: createDialog
-        errorDialog: errorDialog
-    }
-
-    DistroboxShortcutDialog {
-        id: shortcutDialog
-        containersList: mainPage.containersList
-    }
-
-    FilePickerDialog {
-        id: packageFileDialog
-    }
+    ErrorDialog { id: errorDialog }
+    DistroboxRemoveDialog { id: removeDialog }
+    DistroboxCreateDialog { id: createDialog; errorDialog: errorDialog }
+    DistroboxShortcutDialog { id: shortcutDialog; containersList: mainPage.containersList }
+    FilePickerDialog { id: packageFileDialog }
 
     pageStack.initialPage: Kirigami.ScrollablePage {
         id: mainPage
@@ -122,11 +118,7 @@ Kirigami.ApplicationWindow {
         title: i18n("Distrobox Containers")
 
         supportsRefreshing: true
-        onRefreshingChanged: {
-            if (refreshing) {
-                refresh();
-            }
-        }
+        onRefreshingChanged: if (refreshing) refresh()
 
         property var containersList: []
 
@@ -148,9 +140,7 @@ Kirigami.ApplicationWindow {
             }
         ]
 
-        Component.onCompleted: {
-            refresh();
-        }
+        Component.onCompleted: refresh()
 
         ColumnLayout {
             anchors.fill: parent
@@ -166,7 +156,6 @@ Kirigami.ApplicationWindow {
                     contentItem: RowLayout {
                         spacing: Kirigami.Units.smallSpacing
 
-                        // Conditional rendering based on fallbackToDistroColors setting
                         Loader {
                             width: Kirigami.Units.smallSpacing
                             Layout.fillHeight: true
@@ -176,8 +165,8 @@ Kirigami.ApplicationWindow {
                         Component {
                             id: colorComponent
                             Rectangle {
-                                width: Kirigami.Units.smallSpacing
-                                height: parent.height
+                                width: Kirigami.Units.iconSizes.medium
+                                height: Kirigami.Units.iconSizes.medium
                                 color: distroBoxManager.getDistroColor(modelData.image)
                                 radius: 4
                             }
@@ -223,10 +212,8 @@ Kirigami.ApplicationWindow {
 
                             Kirigami.ActionToolBar {
                                 id: actionToolBar
-
                                 Layout.fillWidth: true
                                 spacing: Kirigami.Units.smallSpacing
-
                                 alignment: Qt.AlignRight
                                 display: Controls.Button.IconOnly
                                 flat: false
@@ -236,47 +223,45 @@ Kirigami.ApplicationWindow {
                                         icon.name: "delete"
                                         text: i18n("Remove Container")
                                         onTriggered: {
-                                            removeDialog.containerName = modelData.name;
-                                            removeDialog.open();
+                                            removeDialog.containerName = modelData.name
+                                            removeDialog.open()
                                         }
                                     },
                                     Kirigami.Action {
                                         icon.name: "system-software-update"
                                         text: i18n("Upgrade Container")
                                         onTriggered: {
-                                            distroBoxManager.upgradeContainer(modelData.name);
+                                            distroBoxManager.upgradeContainer(modelData.name)
                                         }
                                     },
                                     Kirigami.Action {
                                         icon.name: "package-x-generic"
                                         text: i18n("Install Package")
                                         onTriggered: {
-                                            packageFileDialog.containerName = modelData.name;
-                                            packageFileDialog.containerImage = modelData.image;
-                                            packageFileDialog.open();
+                                            packageFileDialog.containerName = modelData.name
+                                            packageFileDialog.containerImage = modelData.image
+                                            packageFileDialog.open()
                                         }
                                     },
                                     Kirigami.Action {
                                         icon.name: "applications-other-symbolic"
                                         text: i18n("Manage Applications")
                                         onTriggered: {
-                                            var component = Qt.createComponent("ApplicationsWindow.qml");
+                                            var component = Qt.createComponent("ApplicationsWindow.qml")
                                             if (component.status === Component.Ready) {
                                                 var window = component.createObject(root, {
                                                     containerName: modelData.name
-                                                });
-                                                window.show();
+                                                })
+                                                window.show()
                                             } else {
-                                                console.error("Error loading ApplicationsWindow:", component.errorString());
+                                                console.error("Error loading ApplicationsWindow:", component.errorString())
                                             }
                                         }
                                     },
                                     Kirigami.Action {
                                         icon.name: "utilities-terminal-symbolic"
                                         text: i18n("Open Terminal")
-                                        onTriggered: {
-                                            distroBoxManager.enterContainer(modelData.name);
-                                        }
+                                        onTriggered: distroBoxManager.enterContainer(modelData.name)
                                     }
                                 ]
                             }
@@ -295,24 +280,20 @@ Kirigami.ApplicationWindow {
                     }
                 }
 
-                // Since the UI thread isn't blocked by runCommand anymore, this shows on refresh
-                // that the distroboxes are being loaded -- rather than freezing the application.
                 Controls.BusyIndicator {
                     anchors.centerIn: parent
                     visible: containersListView.count === 0 && refreshing && !loadingTimer.running
                 }
 
-                // Avoids flickering when distroboxes load quickly.
                 Timer {
                     id: loadingTimer
-                    interval: 100 // 100ms
+                    interval: 100
                     repeat: false
                 }
 
-                Component.onCompleted: {
-                    loadingTimer.start();
-                }
+                Component.onCompleted: loadingTimer.start()
             }
         }
     }
 }
+

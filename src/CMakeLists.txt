@@ -22,6 +22,8 @@ target_sources(kontainer
     core/terminallauncher.h
     utils/distrocolors.cpp
     utils/distrocolors.h
+    utils/distroicons.cpp
+    utils/distroicons.h
 )
 
 target_include_directories(kontainer

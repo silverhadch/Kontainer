@@ -118,6 +118,13 @@ public Q_SLOTS:
     QString getDistroColor(const QString &image);
 
     /**
+     * @brief Gets an Icon associated with the distribution
+     * @param container Container name
+     * @return Icon for the distribution or generic Fallback
+     */
+    QString getDistroIcon(const QString &container);
+
+    /**
      * @brief Generates desktop entry files for container applications
      * @param name Container name (optional, generates for all containers if empty)
      * @return true if entry generation was successful, false otherwise

@@ -14,7 +14,7 @@ Kirigami.Dialog {
     id: createDialog
     title: selectingImage ? i18n("Select image") : i18n("Create new container")
     padding: Kirigami.Units.largeSpacing
-    standardButtons: Kirigami.Dialog.Ok | Kirigami.Dialog.Cancel
+    standardButtons: Kirigami.Dialog.NoButton
 
     width: Math.min(root.width - Kirigami.Units.largeSpacing * 4, Kirigami.Units.gridUnit * 30)
 
@@ -26,6 +26,61 @@ Kirigami.Dialog {
     property string selectedImageFull: ""
     property string selectedImageDisplay: ""
     property string imageSearchQuery: ""
+    property string pendingContainerName: ""
+
+    customFooterActions: [
+        Kirigami.Action {
+            icon.name: createDialog.isCreating ? "view-refresh" : "dialog-ok"
+            text: createDialog.isCreating ? i18n("Creating…") : i18n("Create")
+            visible: !createDialog.selectingImage
+            enabled: !createDialog.isCreating
+            onTriggered: createDialog.startCreation()
+        },
+        Kirigami.Action {
+            icon.name: "dialog-cancel"
+            text: i18n("Cancel")
+            visible: !createDialog.selectingImage
+            enabled: !createDialog.isCreating
+            onTriggered: {
+                if (creationMonitorTimer.running) {
+                    creationMonitorTimer.stop();
+                }
+                createDialog.pendingContainerName = "";
+                createDialog.isCreating = false;
+                createDialog.selectingImage = false;
+                createDialog.close();
+            }
+        }
+    ]
+
+    function finalizeCreation() {
+        if (creationMonitorTimer.running) {
+            creationMonitorTimer.stop();
+        }
+
+        isCreating = false;
+        pendingContainerName = "";
+        selectingImage = false;
+
+        nameField.text = "";
+        argsField.text = "";
+        imageSearchQuery = "";
+
+        if (availableImages && availableImages.length > 0) {
+            selectedImageFull = availableImages[0].full;
+            selectedImageDisplay = availableImages[0].display;
+        } else {
+            selectedImageFull = "";
+            selectedImageDisplay = "";
+        }
+
+        if (imageSearchField) {
+            imageSearchField.text = "";
+        }
+
+        updateFilteredImages("");
+        createDialog.close();
+    }
 
     function updateFilteredImages(query) {
         imageSearchQuery = query || "";
@@ -69,44 +124,17 @@ Kirigami.Dialog {
         }
     }
 
-    // Timer for container creation
-    Timer {
-        id: createTimer
-        interval: 0
-        onTriggered: {
-            var imageName = selectedImageFull || selectedImageDisplay;
-
-            var success = distroBoxManager.createContainer(nameField.text, imageName, argsField.text);
-
-            createDialog.isCreating = false;
-            createDialog.standardButtons = Kirigami.Dialog.Ok | Kirigami.Dialog.Cancel;
-
-            if (success) {
-                // Refresh the container list after creation
-                var result = distroBoxManager.listContainers();
-                mainPage.containersList = JSON.parse(result);
-                nameField.text = "";
-                imageSearchField.text = "";
-                updateFilteredImages("");
-                argsField.text = "";
-                createDialog.selectingImage = false;
-                createDialog.close();
-            } else {
-                errorDialog.text = i18n("Failed to create container. Please check your input and try again.");
-                errorDialog.open();
-            }
+    function startCreation() {
+        if (isCreating) {
+            return;
         }
-    }
 
-    onAccepted: {
         var imageName = selectedImageFull || selectedImageDisplay;
 
         if (nameField.text && imageName) {
             console.log("Creating container:", nameField.text, imageName, argsField.text);
             selectingImage = false;
-            // Show busy indicator
             isCreating = true;
-            standardButtons = Kirigami.Dialog.NoButton;
 
             // Use a timer to allow the UI to update before starting the creation process
             createTimer.start();
@@ -116,10 +144,102 @@ Kirigami.Dialog {
         }
     }
 
+    // Timer for container creation
+    Timer {
+        id: createTimer
+        interval: 0
+        onTriggered: {
+            var imageName = selectedImageFull || selectedImageDisplay;
+
+            var success = distroBoxManager.createContainer(nameField.text, imageName, argsField.text);
+
+            if (success) {
+                // Refresh the container list after creation
+                createDialog.pendingContainerName = nameField.text ? nameField.text.trim() : "";
+                var result = distroBoxManager.listContainers();
+                var containers = [];
+                try {
+                    containers = JSON.parse(result);
+                } catch (e) {
+                    containers = [];
+                }
+                mainPage.containersList = containers;
+                createDialog.selectingImage = false;
+
+                var containerFound = false;
+                if (createDialog.pendingContainerName && containers) {
+                    for (var i = 0; i < containers.length; ++i) {
+                        if (containers[i].name === createDialog.pendingContainerName) {
+                            containerFound = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (containerFound) {
+                    createDialog.finalizeCreation();
+                } else {
+                    createDialog.isCreating = true;
+                    if (creationMonitorTimer.running) {
+                        creationMonitorTimer.stop();
+                    }
+                    creationMonitorTimer.start();
+                }
+            } else {
+                createDialog.isCreating = false;
+                createDialog.pendingContainerName = "";
+                if (creationMonitorTimer.running) {
+                    creationMonitorTimer.stop();
+                }
+                errorDialog.text = i18n("Failed to create container. Please check your input and try again.");
+                errorDialog.open();
+            }
+        }
+    }
+
+    Timer {
+        id: creationMonitorTimer
+        interval: 1000
+        repeat: true
+        onTriggered: {
+            if (!createDialog.pendingContainerName || createDialog.pendingContainerName.trim() === "") {
+                stop();
+                createDialog.isCreating = false;
+                return;
+            }
+
+            var result = distroBoxManager.listContainers();
+            var containers = [];
+            try {
+                containers = JSON.parse(result);
+            } catch (e) {
+                containers = [];
+            }
+            mainPage.containersList = containers;
+
+            var containerFound = false;
+            for (var i = 0; i < containers.length; ++i) {
+                if (containers[i].name === createDialog.pendingContainerName) {
+                    containerFound = true;
+                    break;
+                }
+            }
+
+            if (containerFound) {
+                stop();
+                createDialog.finalizeCreation();
+            }
+        }
+    }
+
     onRejected: {
+        if (creationMonitorTimer.running) {
+            creationMonitorTimer.stop();
+        }
+        pendingContainerName = "";
+        isCreating = false;
         createDialog.close();
         createDialog.selectingImage = false;
-        createDialog.standardButtons = Kirigami.Dialog.Ok | Kirigami.Dialog.Cancel;
     }
 
     Component.onCompleted: {
@@ -161,7 +281,6 @@ Kirigami.Dialog {
                         enabled: !createDialog.isCreating
                         onClicked: {
                             createDialog.selectingImage = true;
-                            createDialog.standardButtons = Kirigami.Dialog.NoButton;
                             if (imageSearchField) {
                                 imageSearchField.text = createDialog.imageSearchQuery;
                                 imageSearchField.forceActiveFocus();
@@ -271,7 +390,6 @@ Kirigami.Dialog {
                         createDialog.selectedImageDisplay = modelData.display;
                         imageListView.currentIndex = index;
                         createDialog.selectingImage = false;
-                        createDialog.standardButtons = Kirigami.Dialog.Ok | Kirigami.Dialog.Cancel;
                         if (imageSearchField && imageSearchField.text.length > 0) {
                             Qt.callLater(function () {
                                 imageSearchField.text = "";

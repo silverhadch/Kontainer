@@ -31,6 +31,7 @@ Kirigami.ApplicationWindow {
     }
 
     property bool refreshing: false
+    property bool fallbackToDistroColors: false
 
     function refresh() {
         refreshing = true;
@@ -52,6 +53,16 @@ Kirigami.ApplicationWindow {
                 icon.name: "document-new"
                 enabled: mainPage.containersList.length > 0
                 onTriggered: shortcutDialog.open()
+            },
+            Kirigami.Action {
+                separator: true
+            },
+            Kirigami.Action {
+                text: root.fallbackToDistroColors ? i18n("Use Icons") : i18n("Use Colors")
+                icon.name: root.fallbackToDistroColors ? "preferences-desktop-icons" : "preferences-desktop-color"
+                onTriggered: {
+                    root.fallbackToDistroColors = !root.fallbackToDistroColors;
+                }
             },
             Kirigami.Action {
                 separator: true
@@ -155,24 +166,33 @@ Kirigami.ApplicationWindow {
                     contentItem: RowLayout {
                         spacing: Kirigami.Units.smallSpacing
 
-                        // Old colour logic - commented out
-                        /*
-                         *                       Rectangle {
-                         *                           width: Kirigami.Units.smallSpacing
-                         *                           Layout.fillHeight: true
-                         *                           color: distroBoxManager.getDistroColor(modelData.image)
-                         *                           radius: 4
-                    }
-                    */
+                        // Conditional rendering based on fallbackToDistroColors setting
+                        Loader {
+                            width: Kirigami.Units.smallSpacing
+                            Layout.fillHeight: true
+                            sourceComponent: root.fallbackToDistroColors ? colorComponent : iconComponent
+                        }
 
-                        // New icon logic
-                        Kirigami.Icon {
-                            source: distroBoxManager.getDistroIcon(modelData.name)
-                            width: Kirigami.Units.iconSizes.medium
-                            height: Kirigami.Units.iconSizes.medium
-                            Layout.alignment: Qt.AlignTop
-                            Layout.leftMargin: Kirigami.Units.smallSpacing
-                            Layout.topMargin: Kirigami.Units.smallSpacing
+                        Component {
+                            id: colorComponent
+                            Rectangle {
+                                width: Kirigami.Units.smallSpacing
+                                height: parent.height
+                                color: distroBoxManager.getDistroColor(modelData.image)
+                                radius: 4
+                            }
+                        }
+
+                        Component {
+                            id: iconComponent
+                            Kirigami.Icon {
+                                source: distroBoxManager.getDistroIcon(modelData.name)
+                                width: Kirigami.Units.iconSizes.medium
+                                height: Kirigami.Units.iconSizes.medium
+                                Layout.alignment: Qt.AlignTop
+                                Layout.leftMargin: Kirigami.Units.smallSpacing
+                                Layout.topMargin: Kirigami.Units.smallSpacing
+                            }
                         }
 
                         RowLayout {

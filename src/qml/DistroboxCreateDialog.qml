@@ -1,8 +1,8 @@
 /*
-    SPDX-License-Identifier: GPL-3.0-or-later
-    SPDX-FileCopyrightText: 2025 Denys Madureira <denysmb@zoho.com>
-    SPDX-FileCopyrightText: 2025 Thomas Duckworth <tduck@filotimoproject.org>
-*/
+ *   SPDX-License-Identifier: GPL-3.0-or-later
+ *   SPDX-FileCopyrightText: 2025 Denys Madureira <denysmb@zoho.com>
+ *   SPDX-FileCopyrightText: 2025 Thomas Duckworth <tduck@filotimoproject.org>
+ */
 
 import QtQuick
 import QtQuick.Layouts
@@ -65,6 +65,7 @@ Kirigami.Dialog {
         nameField.text = "";
         argsField.text = "";
         imageSearchQuery = "";
+        initCheckbox.checked = false;
 
         if (availableImages && availableImages.length > 0) {
             selectedImageFull = availableImages[0].full;
@@ -144,14 +145,27 @@ Kirigami.Dialog {
         }
     }
 
+    function getFullArgs() {
+        var fullArgs = argsField.text;
+        if (initCheckbox.checked) {
+            if (fullArgs.length > 0) {
+                fullArgs += " --init --additional-packages \"systemd\"";
+            } else {
+                fullArgs = "--init --additional-packages \"systemd\"";
+            }
+        }
+        return fullArgs;
+    }
+
     // Timer for container creation
     Timer {
         id: createTimer
         interval: 0
         onTriggered: {
             var imageName = selectedImageFull || selectedImageDisplay;
+            var fullArgs = getFullArgs();
 
-            var success = distroBoxManager.createContainer(nameField.text, imageName, argsField.text);
+            var success = distroBoxManager.createContainer(nameField.text, imageName, fullArgs);
 
             if (success) {
                 // Refresh the container list after creation
@@ -304,6 +318,13 @@ Kirigami.Dialog {
                     placeholderText: i18n("--home=/path/to/home (optional)")
                     Layout.fillWidth: true
                 }
+
+                Controls.CheckBox {
+                    id: initCheckbox
+                    Kirigami.FormData.label: i18n("Additional Options")
+                    text: i18n("Add --init --additional-packages \"systemd\"")
+                    checked: false
+                }
             }
 
             Kirigami.Separator {
@@ -323,7 +344,7 @@ Kirigami.Dialog {
 
                 Controls.Label {
                     Layout.fillWidth: true
-                    text: "distrobox create --name " + (nameField.text || "…") + " --image " + (selectedImageFull || selectedImageDisplay || "…") + (argsField.text ? " " + argsField.text : "") + " --yes"
+                    text: "distrobox create --name " + (nameField.text || "…") + " --image " + (selectedImageFull || selectedImageDisplay || "…") + (argsField.text ? " " + argsField.text : "") + (initCheckbox.checked ? " --init --additional-packages \"systemd\"" : "") + " --yes"
                     wrapMode: Text.Wrap
                     font.family: "monospace"
                     font.italic: true

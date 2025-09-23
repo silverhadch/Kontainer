@@ -20,7 +20,6 @@ QString resolveDistroboxIcon(const QString container)
     QStringList searchPaths;
 
     if (isFlatpakRuntime) {
-        // In Flatpak, search multiple possible locations for exported desktop files
         searchPaths = {QDir::homePath() + QStringLiteral("/.var/app/io.github.DenysMb.Kontainer/data/applications"),
                        QDir::homePath() + QStringLiteral("/.var/app/io.github.DenysMb.Kontainer/.local/share/applications"),
                        QStringLiteral("/var/lib/flatpak/exports/share/applications"),
@@ -33,7 +32,7 @@ QString resolveDistroboxIcon(const QString container)
     QStringList patterns;
     patterns << QStringLiteral("%1.desktop").arg(container);
 
-    // Search in all possible paths
+    // 1. Try to resolve from .desktop file
     for (const QString &searchPath : searchPaths) {
         QDir dir(searchPath);
         if (!dir.exists())
@@ -46,16 +45,18 @@ QString resolveDistroboxIcon(const QString container)
             QSettings desktop(file.filePath(), QSettings::IniFormat);
             QString foundIcon = desktop.value(QStringLiteral("Desktop Entry/Icon"), QString()).toString();
 
-            // Stop at first .desktop (even if no icon is set)
             if (!foundIcon.isEmpty())
                 return foundIcon;
-            else
-                return QStringLiteral("preferences-virtualization-container");
         }
     }
 
-    // Fallback if no .desktop file was found at all
+    // 2. Fallback to distrobox terminal icon
+    QString customIconPath = QDir::homePath() + QStringLiteral("/.local/share/icons/distrobox/terminal-distrobox-icon.svg");
+    if (QFile::exists(customIconPath)) {
+        return customIconPath;
+    }
+
+    // 3. Super final fallback
     return QStringLiteral("preferences-virtualization-container");
 }
-
 }

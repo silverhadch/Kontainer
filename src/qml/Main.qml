@@ -68,30 +68,27 @@ Kirigami.ApplicationWindow {
                 enabled: mainPage.containersList.length > 0
                 onTriggered: shortcutDialog.open()
             },
-            Kirigami.Action { separator: true },
-
-            // clearer toggle action
             Kirigami.Action {
-                text: root.fallbackToDistroColors
-                ? i18n("Show Container Icons")
-                : i18n("Show Container Colors")
-                icon.name: root.fallbackToDistroColors
-                ? "preferences-desktop-icons"
-                : "preferences-desktop-color"
-                onTriggered: {
-                    root.fallbackToDistroColors = !root.fallbackToDistroColors
-                }
+                separator: true
             },
 
+            // toggle between distro-provided icons and colors
+            Kirigami.Action {
+                text: i18n("Show Container Icons")
+                icon.name: "view-list-icons"
+                checkable: true
+                checked: !root.fallbackToDistroColors
+                onToggled: root.fallbackToDistroColors = !checked
+            },
             Kirigami.Action {
                 text: i18n("Clone Container…")
                 icon.name: "edit-copy"
                 enabled: mainPage.containersList.length > 0
                 onTriggered: cloneDialog.openWithContainer("")
             },
-
-            Kirigami.Action { separator: true },
-
+            Kirigami.Action {
+                separator: true
+            },
             Kirigami.Action {
                 text: i18n("Open Distrobox Documentation")
                 icon.name: "help-contents"
@@ -102,25 +99,42 @@ Kirigami.ApplicationWindow {
                 icon.name: "help-hint"
                 onTriggered: Qt.openUrlExternally("https://github.com/89luca89/distrobox/blob/main/docs/useful_tips.md")
             },
-            Kirigami.Action { separator: true },
+            Kirigami.Action {
+                separator: true
+            },
             Kirigami.Action {
                 text: i18n("About Kontainer")
                 icon.name: "io.github.DenysMb.Kontainer"
                 onTriggered: {
                     if (root.pageStack.layers.currentItem !== aboutPage) {
-                        root.pageStack.layers.push(aboutPage)
+                        root.pageStack.layers.push(aboutPage);
                     }
                 }
             }
         ]
     }
 
-    ErrorDialog { id: errorDialog }
-    DistroboxRemoveDialog { id: removeDialog }
-    DistroboxCreateDialog { id: createDialog; errorDialog: errorDialog }
-    DistroboxShortcutDialog { id: shortcutDialog; containersList: mainPage.containersList }
-    DistroboxCloneDialog { id: cloneDialog; containersList: mainPage.containersList }
-    FilePickerDialog { id: packageFileDialog }
+    ErrorDialog {
+        id: errorDialog
+    }
+    DistroboxRemoveDialog {
+        id: removeDialog
+    }
+    DistroboxCreateDialog {
+        id: createDialog
+        errorDialog: errorDialog
+    }
+    DistroboxShortcutDialog {
+        id: shortcutDialog
+        containersList: mainPage.containersList
+    }
+    DistroboxCloneDialog {
+        id: cloneDialog
+        containersList: mainPage.containersList
+    }
+    FilePickerDialog {
+        id: packageFileDialog
+    }
 
     pageStack.initialPage: Kirigami.ScrollablePage {
         id: mainPage
@@ -130,7 +144,8 @@ Kirigami.ApplicationWindow {
         title: i18n("Distrobox Containers")
 
         supportsRefreshing: true
-        onRefreshingChanged: if (refreshing) refresh()
+        onRefreshingChanged: if (refreshing)
+            refresh()
 
         property var containersList: []
 
@@ -168,32 +183,28 @@ Kirigami.ApplicationWindow {
                     contentItem: RowLayout {
                         spacing: Kirigami.Units.smallSpacing
 
-                        Loader {
+                        // Loader {
+                        //     width: Kirigami.Units.smallSpacing
+                        //     Layout.fillHeight: true
+                        //     sourceComponent: root.fallbackToDistroColors ? colorComponent : iconComponent
+                        // }
+
+                        Rectangle {
+                            visible: root.fallbackToDistroColors
                             width: Kirigami.Units.smallSpacing
                             Layout.fillHeight: true
-                            sourceComponent: root.fallbackToDistroColors ? colorComponent : iconComponent
+                            color: distroBoxManager.getDistroColor(modelData.image)
+                            radius: 4
                         }
 
-                        Component {
-                            id: colorComponent
-                            Rectangle {
-                                width: Kirigami.Units.iconSizes.medium
-                                height: Kirigami.Units.iconSizes.medium
-                                color: distroBoxManager.getDistroColor(modelData.image)
-                                radius: 4
-                            }
-                        }
-
-                        Component {
-                            id: iconComponent
-                            Kirigami.Icon {
-                                source: distroBoxManager.getDistroIcon(modelData.name)
-                                width: Kirigami.Units.iconSizes.medium
-                                height: Kirigami.Units.iconSizes.medium
-                                Layout.alignment: Qt.AlignTop
-                                Layout.leftMargin: Kirigami.Units.smallSpacing
-                                Layout.topMargin: Kirigami.Units.smallSpacing
-                            }
+                        Kirigami.Icon {
+                            visible: !root.fallbackToDistroColors
+                            source: distroBoxManager.getDistroIcon(modelData.name)
+                            width: Kirigami.Units.iconSizes.medium
+                            height: Kirigami.Units.iconSizes.medium
+                            Layout.alignment: Qt.AlignVCenter
+                            Layout.leftMargin: Kirigami.Units.smallSpacing
+                            Layout.rightMargin: Kirigami.Units.smallSpacing
                         }
 
                         RowLayout {
@@ -235,23 +246,23 @@ Kirigami.ApplicationWindow {
                                         icon.name: "package-x-generic"
                                         text: i18n("Install Package")
                                         onTriggered: {
-                                            packageFileDialog.containerName = modelData.name
-                                            packageFileDialog.containerImage = modelData.image
-                                            packageFileDialog.open()
+                                            packageFileDialog.containerName = modelData.name;
+                                            packageFileDialog.containerImage = modelData.image;
+                                            packageFileDialog.open();
                                         }
                                     },
                                     Kirigami.Action {
                                         icon.name: "applications-all-symbolic"
                                         text: i18n("Manage Applications")
                                         onTriggered: {
-                                            var component = Qt.createComponent("ApplicationsWindow.qml")
+                                            var component = Qt.createComponent("ApplicationsWindow.qml");
                                             if (component.status === Component.Ready) {
                                                 var window = component.createObject(root, {
                                                     containerName: modelData.name
-                                                })
-                                                window.show()
+                                                });
+                                                window.show();
                                             } else {
-                                                console.error("Error loading ApplicationsWindow:", component.errorString())
+                                                console.error("Error loading ApplicationsWindow:", component.errorString());
                                             }
                                         }
                                     },

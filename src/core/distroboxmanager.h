@@ -10,6 +10,7 @@
 #include <QObject>
 #include <QString>
 #include <QStringList>
+#include <functional>
 
 /**
  * @class DistroboxManager
@@ -105,6 +106,14 @@ public Q_SLOTS:
     bool upgradeContainer(const QString &name);
 
     /**
+     * @brief Clones an existing Distrobox container
+     * @param sourceName Name of the container to clone
+     * @param cloneName Name that should be assigned to the cloned container
+     * @return true if the cloning process was successful, false otherwise
+     */
+    bool cloneContainer(const QString &sourceName, const QString &cloneName);
+
+    /**
      * @brief Upgrades packages in all containers
      * @return true if upgrades were successful, false otherwise
      */
@@ -176,9 +185,25 @@ public Q_SLOTS:
      */
     Q_INVOKABLE bool unexportApp(const QString &basename, const QString &container);
 
+Q_SIGNALS:
+    /**
+     * @brief Emitted when a container clone operation finishes.
+     * @param clonedName Name assigned to the cloned container.
+     * @param success Whether the command completed successfully.
+     */
+    void containerCloneFinished(const QString &clonedName, bool success);
+
 private:
     QStringList m_availableImages; ///< List of available container base images
     QStringList m_fullImageNames; ///< List of full image names/URLs
+
+    /**
+     * @brief Checks if an application with the given basename is exported by other containers
+     * @param basename Basename of the application to check
+     * @param excludeContainer Container to exclude from the check
+     * @return true if the app is exported by other containers, false otherwise
+     */
+    bool isAppExportedByOtherContainers(const QString &basename, const QString &excludeContainer);
 
     /**
      * @brief Launches a command in a terminal window
@@ -186,5 +211,5 @@ private:
      * @param workingDirectory Directory to start the terminal in (optional)
      * @return true if the terminal was successfully launched, false otherwise
      */
-    bool launchCommandInTerminal(const QString &command, const QString &workingDirectory = QDir::homePath());
+    bool launchCommandInTerminal(const QString &command, const QString &workingDirectory = QDir::homePath(), const std::function<void(bool)> &onFinished = {});
 };

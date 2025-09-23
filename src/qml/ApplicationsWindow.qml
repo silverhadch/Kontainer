@@ -47,14 +47,8 @@ Kirigami.ApplicationWindow {
     function refreshAppLists() {
         // Only refresh the lists without showing loading screen
         Qt.callLater(function () {
-            var oldExportedCount = exportedApps.length;
             exportedApps = distroBoxManager.exportedApps(containerName) || [];
             allApps = distroBoxManager.allApps(containerName) || [];
-
-            // Switch to exported tab if we just exported an app and the count increased
-            if (exportedApps.length > oldExportedCount && currentTabIndex === 1) {
-                currentTabIndex = 0;
-            }
         });
     }
 
@@ -362,10 +356,6 @@ Kirigami.ApplicationWindow {
                                         lastOperation = modelData.name || modelData.basename;
                                         var success = wasExported ? distroBoxManager.unexportApp(modelData.basename, containerName) : distroBoxManager.exportApp(modelData.basename, containerName);
                                         if (success) {
-                                            if (!wasExported) {
-                                                // Switch to exported tab after exporting
-                                                currentTabIndex = 0;
-                                            }
                                             refreshAppLists();
                                             operationInProgress = false;
                                         } else {
@@ -409,11 +399,6 @@ Kirigami.ApplicationWindow {
                             }
                             lastOperation = i18n("%1 applications", appNames.length);
                             selectedApps = {};
-
-                            // Switch to exported tab if we exported apps
-                            if (currentTabIndex === 1) {
-                                currentTabIndex = 0;
-                            }
                             refreshAppLists();
                             operationInProgress = false;
                         }

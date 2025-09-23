@@ -38,6 +38,7 @@ ecm_target_qml_sources(kontainer
     qml/About.qml
     qml/ApplicationsWindow.qml
     qml/DistroboxCreateDialog.qml
+    qml/DistroboxCloneDialog.qml
     qml/DistroboxRemoveDialog.qml
     qml/DistroboxShortcutDialog.qml
     qml/ErrorDialog.qml

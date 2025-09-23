@@ -1,13 +1,8 @@
 /*
-    SPDX-License-Identifier: GPL-3.0-or-later
-    SPDX-FileCopyrightText: 2025 Denys Madureira <denysmb@zoho.com>
-    SPDX-FileCopyrightText: 2025 Thomas Duckworth <tduck@filotimoproject.org>
-*/
-
-/*
  *   SPDX-License-Identifier: GPL-3.0-or-later
  *   SPDX-FileCopyrightText: 2025 Denys Madureira <denysmb@zoho.com>
  *   SPDX-FileCopyrightText: 2025 Thomas Duckworth <tduck@filotimoproject.org>
+ *   SPDX-FileCopyrightText: 2025 Hadi Chokr <hadichokr@icloud.com>
  */
 
 import QtQuick
@@ -40,7 +35,7 @@ Kirigami.ApplicationWindow {
         property bool showColors: false
     }
 
-    // use the setting instead of a volatile property
+    // alias for clarity
     property alias fallbackToDistroColors: kontainerSettings.showColors
 
     function refresh() {
@@ -48,6 +43,15 @@ Kirigami.ApplicationWindow {
         var result = distroBoxManager.listContainers();
         mainPage.containersList = JSON.parse(result);
         refreshing = false;
+    }
+
+    Connections {
+        target: distroBoxManager
+        function onContainerCloneFinished(clonedName, success) {
+            if (success) {
+                refresh();
+            }
+        }
     }
 
     globalDrawer: Kirigami.GlobalDrawer {
@@ -69,14 +73,21 @@ Kirigami.ApplicationWindow {
             // clearer toggle action
             Kirigami.Action {
                 text: root.fallbackToDistroColors
-                ? i18n("Show Container Icons")
-                : i18n("Show Container Colors")
+                      ? i18n("Show Container Icons")
+                      : i18n("Show Container Colors")
                 icon.name: root.fallbackToDistroColors
-                ? "preferences-desktop-icons"
-                : "preferences-desktop-color"
+                           ? "preferences-desktop-icons"
+                           : "preferences-desktop-color"
                 onTriggered: {
                     root.fallbackToDistroColors = !root.fallbackToDistroColors
                 }
+            },
+
+            Kirigami.Action {
+                text: i18n("Clone Container…")
+                icon.name: "edit-copy"
+                enabled: mainPage.containersList.length > 0
+                onTriggered: cloneDialog.openWithContainer("")
             },
 
             Kirigami.Action { separator: true },
@@ -108,6 +119,7 @@ Kirigami.ApplicationWindow {
     DistroboxRemoveDialog { id: removeDialog }
     DistroboxCreateDialog { id: createDialog; errorDialog: errorDialog }
     DistroboxShortcutDialog { id: shortcutDialog; containersList: mainPage.containersList }
+    DistroboxCloneDialog { id: cloneDialog; containersList: mainPage.containersList }
     FilePickerDialog { id: packageFileDialog }
 
     pageStack.initialPage: Kirigami.ScrollablePage {
@@ -220,21 +232,6 @@ Kirigami.ApplicationWindow {
 
                                 actions: [
                                     Kirigami.Action {
-                                        icon.name: "delete"
-                                        text: i18n("Remove Container")
-                                        onTriggered: {
-                                            removeDialog.containerName = modelData.name
-                                            removeDialog.open()
-                                        }
-                                    },
-                                    Kirigami.Action {
-                                        icon.name: "system-software-update"
-                                        text: i18n("Upgrade Container")
-                                        onTriggered: {
-                                            distroBoxManager.upgradeContainer(modelData.name)
-                                        }
-                                    },
-                                    Kirigami.Action {
                                         icon.name: "package-x-generic"
                                         text: i18n("Install Package")
                                         onTriggered: {
@@ -244,7 +241,7 @@ Kirigami.ApplicationWindow {
                                         }
                                     },
                                     Kirigami.Action {
-                                        icon.name: "applications-other-symbolic"
+                                        icon.name: "applications-all-symbolic"
                                         text: i18n("Manage Applications")
                                         onTriggered: {
                                             var component = Qt.createComponent("ApplicationsWindow.qml")
@@ -261,7 +258,35 @@ Kirigami.ApplicationWindow {
                                     Kirigami.Action {
                                         icon.name: "utilities-terminal-symbolic"
                                         text: i18n("Open Terminal")
-                                        onTriggered: distroBoxManager.enterContainer(modelData.name)
+                                        onTriggered: {
+                                            distroBoxManager.enterContainer(modelData.name);
+                                        }
+                                    },
+                                    Kirigami.Action {
+                                        text: i18n("More options")
+                                        icon.name: "view-more-symbolic"
+                                        Kirigami.Action {
+                                            icon.name: "system-software-update"
+                                            text: i18n("Upgrade Container")
+                                            onTriggered: {
+                                                distroBoxManager.upgradeContainer(modelData.name);
+                                            }
+                                        }
+                                        Kirigami.Action {
+                                            icon.name: "edit-copy"
+                                            text: i18n("Clone Container")
+                                            onTriggered: {
+                                                cloneDialog.openWithContainer(modelData.name);
+                                            }
+                                        }
+                                        Kirigami.Action {
+                                            icon.name: "delete"
+                                            text: i18n("Remove Container")
+                                            onTriggered: {
+                                                removeDialog.containerName = modelData.name;
+                                                removeDialog.open();
+                                            }
+                                        }
                                     }
                                 ]
                             }
@@ -296,4 +321,3 @@ Kirigami.ApplicationWindow {
         }
     }
 }
-

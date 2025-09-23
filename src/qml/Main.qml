@@ -183,12 +183,6 @@ Kirigami.ApplicationWindow {
                     contentItem: RowLayout {
                         spacing: Kirigami.Units.smallSpacing
 
-                        // Loader {
-                        //     width: Kirigami.Units.smallSpacing
-                        //     Layout.fillHeight: true
-                        //     sourceComponent: root.fallbackToDistroColors ? colorComponent : iconComponent
-                        // }
-
                         Rectangle {
                             visible: root.fallbackToDistroColors
                             width: Kirigami.Units.smallSpacing
@@ -197,14 +191,32 @@ Kirigami.ApplicationWindow {
                             radius: 4
                         }
 
-                        Kirigami.Icon {
+                        Rectangle {
                             visible: !root.fallbackToDistroColors
-                            source: distroBoxManager.getDistroIcon(modelData.name)
-                            width: Kirigami.Units.iconSizes.medium
-                            height: Kirigami.Units.iconSizes.medium
-                            Layout.alignment: Qt.AlignVCenter
-                            Layout.leftMargin: Kirigami.Units.smallSpacing
-                            Layout.rightMargin: Kirigami.Units.smallSpacing
+                            width: Kirigami.Units.iconSizes.medium + Kirigami.Units.smallSpacing * 2
+                            Layout.fillHeight: true
+                            color: {
+                                const baseColor = distroBoxManager.getDistroColor(modelData.image);
+                                if (typeof baseColor === "string" && baseColor.startsWith("#")) {
+                                    const hex = baseColor.slice(1);
+                                    const alphaHex = Math.round(0.15 * 255).toString(16).padStart(2, "0");
+                                    if (hex.length === 6) {
+                                        return "#" + alphaHex + hex;
+                                    }
+                                    if (hex.length === 8) {
+                                        return "#" + alphaHex + hex.slice(2);
+                                    }
+                                }
+                                return Qt.rgba(0, 0, 0, 0.15);
+                            }
+                            radius: 4
+
+                            Kirigami.Icon {
+                                anchors.centerIn: parent
+                                source: distroBoxManager.getDistroIcon(modelData.name)
+                                width: Kirigami.Units.iconSizes.medium
+                                height: Kirigami.Units.iconSizes.medium
+                            }
                         }
 
                         RowLayout {

@@ -11,6 +11,9 @@
     "--device=dri",
     "--talk-name=org.freedesktop.Flatpak",
     "--filesystem=~/.local/share/applications:ro"
+    "--filesystem=~/.local/share/icons/distrobox:ro",
+    "--filesystem=~/.local/share/flatpak/exports:ro",
+    "--filesystem=/var/lib/flatpak/exports:ro"
   ],
   "modules": [
     {

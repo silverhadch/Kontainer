@@ -322,7 +322,7 @@ Kirigami.Dialog {
                 Controls.CheckBox {
                     id: initCheckbox
                     Kirigami.FormData.label: i18n("Additional Options")
-                    text: i18n("Add --init --additional-packages \"systemd\"")
+                    text: i18n("Systemd Init Support")
                     checked: false
                 }
             }

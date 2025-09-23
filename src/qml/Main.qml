@@ -155,11 +155,24 @@ Kirigami.ApplicationWindow {
                     contentItem: RowLayout {
                         spacing: Kirigami.Units.smallSpacing
 
-                        Rectangle {
-                            width: Kirigami.Units.smallSpacing
-                            Layout.fillHeight: true
-                            color: distroBoxManager.getDistroColor(modelData.image)
-                            radius: 4
+                        // Old colour logic - commented out
+                        /*
+                         *                       Rectangle {
+                         *                           width: Kirigami.Units.smallSpacing
+                         *                           Layout.fillHeight: true
+                         *                           color: distroBoxManager.getDistroColor(modelData.image)
+                         *                           radius: 4
+                    }
+                    */
+
+                        // New icon logic
+                        Kirigami.Icon {
+                            source: distroBoxManager.getDistroIcon(modelData.name)
+                            width: Kirigami.Units.iconSizes.medium
+                            height: Kirigami.Units.iconSizes.medium
+                            Layout.alignment: Qt.AlignTop
+                            Layout.leftMargin: Kirigami.Units.smallSpacing
+                            Layout.topMargin: Kirigami.Units.smallSpacing
                         }
 
                         RowLayout {

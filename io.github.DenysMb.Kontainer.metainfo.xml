@@ -54,6 +54,12 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+    <release version="1.2.0" date="2025-09-26">
+      <description>
+        <p>Allow cloning an existing container to kickstart new environments quickly.</p>
+        <p>Add an optional toggle to display container icons.</p>
+      </description>
+    </release>
     <release version="1.1.0" date="2025-09-21">
         <description>
         <p>Add "Upgrade all" button to upgrade all distroboxes at once.</p>

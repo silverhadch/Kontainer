@@ -35,6 +35,12 @@ target_include_directories(kontainer
 ecm_target_qml_sources(kontainer
     SOURCES
     qml/Main.qml
+    qml/components/ContainerActionsToolbar.qml
+    qml/components/ContainerBadge.qml
+    qml/components/ContainerCard.qml
+    qml/components/ContainerListStatus.qml
+    qml/components/MainContainersPage.qml
+    qml/components/MainGlobalDrawer.qml
     qml/About.qml
     qml/ApplicationsWindow.qml
     qml/DistroboxCreateDialog.qml

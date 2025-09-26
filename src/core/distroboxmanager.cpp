@@ -25,6 +25,7 @@
 #include <QStandardPaths>
 #include <QTextStream>
 #include <QUrl>
+#include <distroicons.h>
 
 using namespace Qt::Literals::StringLiterals;
 
@@ -297,6 +298,12 @@ bool DistroboxManager::launchCommandInTerminal(const QString &command, const QSt
 QString DistroboxManager::getDistroColor(const QString &image)
 {
     return DistroColors::colorForImage(image);
+}
+
+// Returns an Icon associated with the distribution for UI purposes
+QString DistroboxManager::getDistroIcon(const QString &container)
+{
+    return DistroIcons::resolveDistroboxIcon(container);
 }
 
 // Generates .desktop files for applications in containers

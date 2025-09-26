@@ -13,15 +13,16 @@ Item {
     property string containerName: ""
     property string containerImage: ""
 
+    readonly property int iconBackgroundSize: Kirigami.Units.iconSizes.medium + Kirigami.Units.smallSpacing * 2
+
     Layout.fillHeight: true
-    implicitWidth: fallbackToDistroColors ? fallbackColorStrip.implicitWidth : iconContainer.implicitWidth
-    implicitHeight: iconContainer.implicitHeight
+    width: fallbackToDistroColors ? Kirigami.Units.smallSpacing : iconBackgroundSize
+    implicitWidth: width
+    implicitHeight: iconBackgroundSize
 
     Rectangle {
         id: fallbackColorStrip
         visible: badge.fallbackToDistroColors
-        width: Kirigami.Units.smallSpacing
-        implicitWidth: width
         anchors.fill: parent
         color: distroBoxManager.getDistroColor(badge.containerImage)
         radius: 4
@@ -30,9 +31,9 @@ Item {
     Rectangle {
         id: iconContainer
         visible: !badge.fallbackToDistroColors
-        width: Kirigami.Units.iconSizes.medium + Kirigami.Units.smallSpacing * 2
+        width: badge.iconBackgroundSize
         implicitWidth: width
-        height: Kirigami.Units.iconSizes.medium + Kirigami.Units.smallSpacing * 2
+        height: badge.iconBackgroundSize
         implicitHeight: height
         anchors.verticalCenter: parent.verticalCenter
         color: {

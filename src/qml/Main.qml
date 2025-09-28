@@ -70,6 +70,7 @@ Kirigami.ApplicationWindow {
     }
     DistroboxRemoveDialog {
         id: removeDialog
+        mainPage: containersPage
     }
     DistroboxCreateDialog {
         id: createDialog

@@ -20,6 +20,7 @@ Kirigami.Dialog {
 
     property bool isCreating: false
     property var errorDialog
+    required property var mainPage
     property bool selectingImage: false
     property var availableImages: []
     property var filteredImages: []
@@ -163,7 +164,9 @@ Kirigami.Dialog {
                 } catch (e) {
                     containers = [];
                 }
-                mainPage.containersList = containers;
+                if (mainPage) {
+                    mainPage.containersList = containers;
+                }
                 createDialog.selectingImage = false;
 
                 var containerFound = false;
@@ -215,7 +218,9 @@ Kirigami.Dialog {
             } catch (e) {
                 containers = [];
             }
-            mainPage.containersList = containers;
+            if (mainPage) {
+                mainPage.containersList = containers;
+            }
 
             var containerFound = false;
             for (var i = 0; i < containers.length; ++i) {

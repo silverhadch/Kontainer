@@ -74,6 +74,7 @@ Kirigami.ApplicationWindow {
     DistroboxCreateDialog {
         id: createDialog
         errorDialog: errorDialog
+        mainPage: containersPage
     }
     DistroboxShortcutDialog {
         id: shortcutDialog

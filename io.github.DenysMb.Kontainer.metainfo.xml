@@ -54,6 +54,18 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+    <release version="1.2.1" date="2025-09-28">
+      <description>
+        <p>Fix creation and removal dialogs so they close automatically after the container list refreshes.</p>
+        <p>Prevent reference errors when updating containers following create or remove operations.</p>
+      </description>
+    </release>
+    <release version="1.2.0" date="2025-09-26">
+      <description>
+        <p>Allow cloning an existing container to kickstart new environments quickly.</p>
+        <p>Add an optional toggle to display container icons.</p>
+      </description>
+    </release>
     <release version="1.1.0" date="2025-09-21">
         <description>
         <p>Add "Upgrade all" button to upgrade all distroboxes at once.</p>

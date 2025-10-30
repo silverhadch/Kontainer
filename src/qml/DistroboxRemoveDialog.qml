@@ -17,6 +17,7 @@ Kirigami.Dialog {
     standardButtons: Kirigami.Dialog.Yes | Kirigami.Dialog.No
 
     property string containerName: ""
+    required property var mainPage
     
     onAccepted: {
         if (containerName) {
@@ -24,7 +25,13 @@ Kirigami.Dialog {
             if (success) {
                 // Refresh the container list
                 var result = distroBoxManager.listContainers()
-                mainPage.containersList = JSON.parse(result)
+                if (mainPage) {
+                    try {
+                        mainPage.containersList = JSON.parse(result)
+                    } catch (e) {
+                        mainPage.containersList = []
+                    }
+                }
             } else {
                 errorDialog.text = i18n("Failed to remove container")
                 errorDialog.open()

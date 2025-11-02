@@ -42,10 +42,10 @@ Those are required even for Flatpak version:
 
 ### Screenshots
 
-![Screenshot_20250508_193522](https://github.com/user-attachments/assets/3d1204d9-18e0-4c0d-a188-cf8eb1c3adfd)
-![Screenshot_20250508_193559](https://github.com/user-attachments/assets/61d1deb0-2ee8-47d4-b059-bbf301749e91)
-![Screenshot_20250508_193616](https://github.com/user-attachments/assets/f5eb2268-ceba-451c-abe5-f6794de70ee0)
-![Screenshot_20250508_193644](https://github.com/user-attachments/assets/2fe98ce4-8898-4d3e-a793-021a4af1db4b)
-
+<img width="830" height="658" alt="Screenshot_20251102_123101" src="https://github.com/user-attachments/assets/1399b1e2-1c95-42d0-8d2d-c9aeb8159dca" />
+<img width="830" height="658" alt="Screenshot_20251102_123136" src="https://github.com/user-attachments/assets/93cbf483-4b48-4f63-a6e5-efad71416799" />
+<img width="830" height="658" alt="Screenshot_20251102_123220" src="https://github.com/user-attachments/assets/827aa8af-976e-43b2-8653-c096d694cf20" />
+<img width="830" height="658" alt="Screenshot_20251102_124023" src="https://github.com/user-attachments/assets/4ac20850-79ab-4226-bb92-9383691163fa" />
+<img width="730" height="558" alt="Screenshot_20251102_123338" src="https://github.com/user-attachments/assets/799dc5e4-a92a-4f30-ad1e-c98cd719018d" />
 
 > Icon by [@Micro856](https://github.com/Micro856). Thank you for the contribution!

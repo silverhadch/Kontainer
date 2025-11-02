@@ -58,12 +58,24 @@ Kirigami.AbstractCard {
             ContainerActionsToolbar {
                 containerName: card.container.name || ""
                 containerImage: card.container.image || ""
-                onInstallPackageRequested: card.installPackageRequested(containerName, containerImage)
-                onManageApplicationsRequested: card.manageApplicationsRequested(containerName)
-                onOpenTerminalRequested: card.openTerminalRequested(containerName)
-                onUpgradeContainerRequested: card.upgradeContainerRequested(containerName)
-                onCloneContainerRequested: card.cloneContainerRequested(containerName)
-                onRemoveContainerRequested: card.removeContainerRequested(containerName)
+                onInstallPackageRequested: function(containerName, containerImage) {
+                    card.installPackageRequested(containerName, containerImage)
+                }
+                onManageApplicationsRequested: function(containerName) {
+                    card.manageApplicationsRequested(containerName)
+                }
+                onOpenTerminalRequested: function(containerName) {
+                    card.openTerminalRequested(containerName)
+                }
+                onUpgradeContainerRequested: function(containerName) {
+                    card.upgradeContainerRequested(containerName)
+                }
+                onCloneContainerRequested: function(containerName) {
+                    card.cloneContainerRequested(containerName)
+                }
+                onRemoveContainerRequested: function(containerName) {
+                    card.removeContainerRequested(containerName)
+                }
             }
         }
     }

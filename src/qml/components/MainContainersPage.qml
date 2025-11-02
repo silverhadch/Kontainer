@@ -13,10 +13,10 @@ Kirigami.ScrollablePage {
     property bool appRefreshing: false
     property bool fallbackToDistroColors: false
 
-    signal createRequested()
-    signal upgradeAllRequested()
-    signal refreshRequested()
-    signal initialLoadRequested()
+    signal createRequested
+    signal upgradeAllRequested
+    signal refreshRequested
+    signal initialLoadRequested
     signal installPackageRequested(string containerName, string containerImage)
     signal manageApplicationsRequested(string containerName)
     signal openTerminalRequested(string containerName)
@@ -64,12 +64,24 @@ Kirigami.ScrollablePage {
             delegate: ContainerCard {
                 container: modelData
                 fallbackToDistroColors: page.fallbackToDistroColors
-                onInstallPackageRequested: page.installPackageRequested(containerName, containerImage)
-                onManageApplicationsRequested: page.manageApplicationsRequested(containerName)
-                onOpenTerminalRequested: page.openTerminalRequested(containerName)
-                onUpgradeContainerRequested: page.upgradeContainerRequested(containerName)
-                onCloneContainerRequested: page.cloneContainerRequested(containerName)
-                onRemoveContainerRequested: page.removeContainerRequested(containerName)
+                onInstallPackageRequested: function (containerName, containerImage) {
+                    page.installPackageRequested(containerName, containerImage);
+                }
+                onManageApplicationsRequested: function (containerName) {
+                    page.manageApplicationsRequested(containerName);
+                }
+                onOpenTerminalRequested: function (containerName) {
+                    page.openTerminalRequested(containerName);
+                }
+                onUpgradeContainerRequested: function (containerName) {
+                    page.upgradeContainerRequested(containerName);
+                }
+                onCloneContainerRequested: function (containerName) {
+                    page.cloneContainerRequested(containerName);
+                }
+                onRemoveContainerRequested: function (containerName) {
+                    page.removeContainerRequested(containerName);
+                }
             }
 
             ContainerListStatus {

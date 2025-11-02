@@ -40,12 +40,20 @@
 
   <screenshots>
     <screenshot type="default">
-      <image>
-        https://i.imgur.com/2VdJEpK.png</image>
+      <image>https://i.imgur.com/wJiluC6.png</image>
+      <caption>Kontainer main window</caption>
     </screenshot>
     <screenshot>
-      <image>
-        https://i.imgur.com/ELWPNFY.png</image>
+      <image>https://i.imgur.com/q8Wescd.png</image>
+      <caption>Kontainer main window without distro icons</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://i.imgur.com/2LqmBL3.png</image>
+      <caption>Distrobox creation dialog</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://i.imgur.com/eYEadVt.png</image>
+      <caption>Application management window</caption>
     </screenshot>
   </screenshots>
 

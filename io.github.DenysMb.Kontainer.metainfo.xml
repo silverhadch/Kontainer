@@ -54,6 +54,11 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+  <release version="1.2.3" date="2025-11-02">
+      <description>
+        <p>Fix an error that prevented Kontainer to start natively installed distrobox inside flatpak'ed konsole.</p>
+      </description>
+    </release>
     <release version="1.2.2" date="2025-11-02">
       <description>
         <p>Fix an error so dialogs close correctly after provisioning containers.</p>

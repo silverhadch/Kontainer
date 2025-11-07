@@ -1,9 +1,9 @@
 /*
-    SPDX-License-Identifier: GPL-3.0-or-later
-    SPDX-FileCopyrightText: 2025 Denys Madureira <denysmb@zoho.com>
-    SPDX-FileCopyrightText: 2025 Thomas Duckworth <tduck@filotimoproject.org>
-    SPDX-FileCopyrightText: 2025 Hadi Chokr <hadichokr@icloud.com>
-*/
+ *   SPDX-License-Identifier: GPL-3.0-or-later
+ *   SPDX-FileCopyrightText: 2025 Denys Madureira <denysmb@zoho.com>
+ *   SPDX-FileCopyrightText: 2025 Thomas Duckworth <tduck@filotimoproject.org>
+ *   SPDX-FileCopyrightText: 2025 Hadi Chokr <hadichokr@icloud.com>
+ */
 
 #include "distroboxmanager.h"
 #include "distroboxcli.h"
@@ -25,6 +25,8 @@
 #include <QStandardPaths>
 #include <QTextStream>
 #include <QUrl>
+#include <sys/xattr.h>
+#include <QByteArray>
 #include <distroicons.h>
 
 using namespace Qt::Literals::StringLiterals;
@@ -48,6 +50,27 @@ QString runContainerCommand(const QString &container, const QString &script, boo
 {
     const QString command = u"distrobox enter %1 -- sh -c %2"_s.arg(container, KShell::quoteArg(script));
     return DistroboxCli::runCommand(command, success);
+}
+
+static QString resolveDocumentPortalPath(const QString &path)
+{
+    // Only check paths under /run/user/$UID/doc/
+    if (!path.startsWith(QStringLiteral("/run/user/")))
+        return path;
+
+    if (!path.contains(QStringLiteral("/doc/")))
+        return path;
+
+    QByteArray value(4096, '\0');
+    ssize_t len = getxattr(path.toLocal8Bit().constData(),
+                           "user.document-portal.host-path",
+                           value.data(), value.size());
+    if (len > 0) {
+        return QString::fromUtf8(value.constData(), len);
+    }
+
+    // No xattr or error — fallback to original path
+    return path;
 }
 
 QString resolveIconPathInContainer(const QString &container, const QString &iconValue)
@@ -258,7 +281,7 @@ bool DistroboxManager::cloneContainer(const QString &sourceName, const QString &
     QString message = i18n("Press any key to close this terminal…");
     QString cloneCmd =
         u"distrobox-stop %1 -Y && distrobox create --clone %1 --name %2 && echo '' && echo '%3' && read -s -n 1"_s.arg(trimmedSource, trimmedClone, message);
-    QString command = u"/usr/bin/env bash -c \"%1\""_s.arg(cloneCmd);
+    QString command = u"sh -c \"%1\""_s.arg(cloneCmd);
     QPointer<DistroboxManager> self(this);
     auto callback = [self, trimmedClone](bool success) {
         if (!self) {
@@ -275,7 +298,7 @@ bool DistroboxManager::upgradeContainer(const QString &name)
 {
     QString message = i18n("Press any key to close this terminal…");
     QString upgradeCmd = u"distrobox upgrade %1 && echo '' && echo '%2' && read -s -n 1"_s.arg(name, message);
-    QString command = u"/usr/bin/env bash -c \"%1\""_s.arg(upgradeCmd);
+    QString command = u"sh -c \"%1\""_s.arg(upgradeCmd);
 
     return launchCommandInTerminal(command);
 }
@@ -284,7 +307,7 @@ bool DistroboxManager::upgradeAllContainer()
 {
     QString message = i18n("Press any key to close this terminal…");
     QString upgradeCmd = u"distrobox upgrade --all && echo '' && echo '%1' && read -s -n 1"_s.arg(message);
-    QString command = u"/usr/bin/env bash -c \"%1\""_s.arg(upgradeCmd);
+    QString command = u"sh -c \"%1\""_s.arg(upgradeCmd);
 
     return launchCommandInTerminal(command);
 }
@@ -323,32 +346,52 @@ bool DistroboxManager::generateEntry(const QString &name)
     return success;
 }
 
-// Installs a package file in a container using the appropriate package manager
+// Installs a Package File with the Containers Package Manager
+// Doesnt like POSIX sh and wants GNU bash for launching in the Terminal
+// TODO: Make the function use POSIX sh to increase portability
 bool DistroboxManager::installPackageInContainer(const QString &name, const QString &packagePath, const QString &image)
 {
     QString homeDir = QDir::homePath();
+
     // Remove "file://" prefix if present
     QString actualPackagePath = packagePath;
-    if (actualPackagePath.startsWith(u"file://"_s)) {
+    if (actualPackagePath.startsWith(u"file://"_s))
         actualPackagePath = actualPackagePath.mid(7);
-    }
+
+    // Resolve document portal FUSE path to host path if needed
+    actualPackagePath = resolveDocumentPortalPath(actualPackagePath);
 
     const auto installCmd = PackageInstallCommand::forImage(image, actualPackagePath);
     if (!installCmd) {
-        // Show error message if distribution is not recognized
-        QString message = i18n(
-            "Cannot automatically install packages for this distribution. Please enter the distrobox manually and install it using the appropriate package "
-            "manager.");
-        QString script = u"echo "_s + KShell::quoteArg(message) + u"; read -n 1"_s;
-        QString command = u"/usr/bin/env bash -c "_s + KShell::quoteArg(script);
+        const QString message = i18n(
+            "Cannot automatically install packages for this distribution.\n"
+            "Please enter the distrobox manually and install it using the appropriate package manager.");
+
+        // Escape single quotes for embedding inside double quotes
+        QString safeMessage = message;
+        safeMessage.replace(u"'"_s, u"'\\''"_s);
+
+        // Use consistent quoting style as the install path
+        const QString script = QStringLiteral("echo '%1'; read -n 1 -s -r -p \'Press any key to continue...\'").arg(safeMessage);
+
+        // Bash -c in double quotes to avoid nested single-quote issues
+        const QString command = QStringLiteral("bash -c \"%1\"").arg(script);
+
         return launchCommandInTerminal(command, homeDir);
     }
 
-    // Run installation command in container and wait for user input before closing
     QString message = i18n("Press any key to close this terminal…");
-    QString fullCmd = u"distrobox enter %1 -- /usr/bin/env bash -c \"%2 && echo '' && echo '%3' && read -s -n 1\""_s.arg(name, *installCmd, message);
-    QString command = u"/usr/bin/env bash -c "_s + KShell::quoteArg(fullCmd);
-    return launchCommandInTerminal(command, homeDir);
+
+    QString safeMessage = message;
+    safeMessage.replace(u"'"_s, u"'\\''"_s);
+
+    QString innerScript = QStringLiteral("%1 && echo && echo '%2' && read -s -n 1")
+    .arg(*installCmd, safeMessage);
+
+    QString fullCmd = QStringLiteral("distrobox enter %1 -- /usr/bin/env bash -c \"%2\"")
+    .arg(name, innerScript);
+
+    return launchCommandInTerminal(fullCmd, homeDir);
 }
 
 bool DistroboxManager::isFlatpak() const

@@ -114,6 +114,13 @@ public Q_SLOTS:
     bool cloneContainer(const QString &sourceName, const QString &cloneName);
 
     /**
+     * @brief Assembles a Distrobox container from an .ini configuration file
+     * @param iniFile Path to the .ini file used to define the container
+     * @return true if the assembly process was successfully started, false otherwise
+     */
+    bool assembleContainer(const QString &iniFile);
+
+    /**
      * @brief Upgrades packages in all containers
      * @return true if upgrades were successful, false otherwise
      */
@@ -192,6 +199,12 @@ Q_SIGNALS:
      * @param success Whether the command completed successfully.
      */
     void containerCloneFinished(const QString &clonedName, bool success);
+
+    /**
+     * @brief Emitted when a container assembly operation finishes.
+     * @param success Whether the assembly command completed successfully.
+     */
+    void containerAssembleFinished(bool success);
 
 private:
     QStringList m_availableImages; ///< List of available container base images

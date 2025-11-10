@@ -293,6 +293,38 @@ bool DistroboxManager::cloneContainer(const QString &sourceName, const QString &
     return launchCommandInTerminal(command, QDir::homePath(), callback);
 }
 
+// Assemble a container from an .ini File
+bool DistroboxManager::assembleContainer(const QString &iniFile)
+{
+    QString trimmedFile = iniFile.trimmed();
+    if (trimmedFile.isEmpty()) {
+        return false;
+    }
+
+    if (trimmedFile.startsWith(u"file://"_s)) {
+        trimmedFile = trimmedFile.mid(7);
+    }
+
+    // Resolve potential portal FUSE path to actual host path
+    trimmedFile = resolveDocumentPortalPath(trimmedFile);
+
+    QString message = i18n("Press any key to close this terminal…");
+
+    QString assembleCmd = u"distrobox assemble create --file %1 && echo '' && echo '%2' && read -s -n 1"_s
+    .arg(trimmedFile, message);
+
+    QString command = u"sh -c \"%1\""_s.arg(assembleCmd);
+
+    QPointer<DistroboxManager> self(this);
+    auto callback = [self](bool success) {
+        if (!self)
+            return;
+        Q_EMIT self->containerAssembleFinished(success);
+    };
+
+    return launchCommandInTerminal(command, QDir::homePath(), callback);
+}
+
 // Upgrades all packages in a container
 bool DistroboxManager::upgradeContainer(const QString &name)
 {

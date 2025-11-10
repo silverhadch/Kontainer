@@ -1,12 +1,13 @@
 /*
-    SPDX-License-Identifier: GPL-3.0-or-later
-    SPDX-FileCopyrightText: 2025 Denys Madureira <denysmb@zoho.com>
-    SPDX-FileCopyrightText: 2025 Thomas Duckworth <tduck@filotimoproject.org>
-*/
+ *    SPDX-License-Identifier: GPL-3.0-or-later
+ *    SPDX-FileCopyrightText: 2025 Denys Madureira <denysmb@zoho.com>
+ *    SPDX-FileCopyrightText: 2025 Thomas Duckworth <tduck@filotimoproject.org>
+ */
 
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as Controls
+import QtQuick.Dialogs
 
 import org.kde.kirigami as Kirigami
 
@@ -29,6 +30,16 @@ Kirigami.Dialog {
     property string imageSearchQuery: ""
     property string pendingContainerName: ""
 
+    FileDialog {
+        id: iniFileDialog
+        title: i18n("Choose .ini file")
+        fileMode: FileDialog.OpenFile
+        nameFilters: [i18n("INI files (*.ini)")]
+        onAccepted: {
+            distroBoxManager.assembleContainer(selectedFile);
+        }
+    }
+
     customFooterActions: [
         Kirigami.Action {
             icon.name: createDialog.isCreating ? "view-refresh" : "dialog-ok"
@@ -36,6 +47,19 @@ Kirigami.Dialog {
             visible: !createDialog.selectingImage
             enabled: !createDialog.isCreating
             onTriggered: createDialog.startCreation()
+        },
+        Kirigami.Action {
+            icon.name: "document-open"
+            text: i18n("Assemble")
+            visible: !createDialog.selectingImage
+            enabled: !createDialog.isCreating
+            onTriggered: {
+                if (creationMonitorTimer.running) {
+                    creationMonitorTimer.stop();
+                }
+                iniFileDialog.open();
+                createDialog.close();
+            }
         },
         Kirigami.Action {
             icon.name: "dialog-cancel"
@@ -309,6 +333,13 @@ Kirigami.Dialog {
                     placeholderText: i18n("--home /path/to/home (optional)")
                     Layout.fillWidth: true
                 }
+            }
+
+            Kirigami.InlineMessage {
+                Layout.fillWidth: true
+                visible: true
+                type: Kirigami.MessageType.Information
+                text: i18n("Use Assemble to pick a distrobox.ini manifest. Kontainer will run \"distrobox assemble create --file <manifest>\" to build every container listed there.")
             }
 
             Kirigami.Separator {

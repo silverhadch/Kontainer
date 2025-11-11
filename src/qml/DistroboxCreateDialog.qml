@@ -163,13 +163,14 @@ Kirigami.Dialog {
         }
 
         var imageName = selectedImageFull || selectedImageDisplay;
+        var safeName = nameField.text.trim().replace(/\s+/g, "-"); // sanitize whitespace
 
-        if (nameField.text && imageName) {
-            console.log("Creating container:", nameField.text, imageName, getFullArgs());
+        if (safeName && imageName) {
+            console.log("Creating container:", safeName, imageName, getFullArgs());
             selectingImage = false;
             isCreating = true;
 
-            // Use a timer to allow the UI to update before starting the creation process
+            nameField.text = safeName; // reflect sanitized name in UI
             createTimer.start();
         } else {
             errorDialog.text = i18n("Name and Image fields are required");
@@ -177,17 +178,17 @@ Kirigami.Dialog {
         }
     }
 
-    // Timer for container creation
     Timer {
         id: createTimer
         interval: 0
         onTriggered: {
             var imageName = selectedImageFull || selectedImageDisplay;
+            var safeName = nameField.text.trim().replace(/\s+/g, "-");
 
-            var success = distroBoxManager.createContainer(nameField.text, imageName, getFullArgs());
+            var success = distroBoxManager.createContainer(safeName, imageName, getFullArgs());
 
             if (success) {
-                createDialog.pendingContainerName = nameField.text ? nameField.text.trim() : "";
+                createDialog.pendingContainerName = safeName;
                 var result = distroBoxManager.listContainers();
                 var containers = [];
                 try {
@@ -302,6 +303,15 @@ Kirigami.Dialog {
                     Kirigami.FormData.label: i18n("Name")
                     placeholderText: i18n("Fedora")
                     Layout.fillWidth: true
+
+                    // Real-time whitespace sanitization
+                    onTextChanged: {
+                        var sanitized = text.replace(/\s+/g, "-");
+                        if (sanitized !== text) {
+                            text = sanitized;
+                            cursorPosition = text.length;
+                        }
+                    }
                 }
 
                 ColumnLayout {
@@ -375,7 +385,8 @@ Kirigami.Dialog {
                 Controls.Label {
                     Layout.fillWidth: true
                     text: "distrobox create --name " +
-                    (nameField.text || "…") + " --image " +
+                    ((nameField.text && nameField.text.trim().length > 0) ? nameField.text.trim().replace(/\s+/g, "-") : "…") +
+                    " --image " +
                     (selectedImageFull || selectedImageDisplay || "…") +
                     (getFullArgs().length > 0 ? " " + getFullArgs() : "") + " --yes"
                     wrapMode: Text.Wrap

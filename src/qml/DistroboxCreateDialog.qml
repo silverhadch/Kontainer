@@ -1,14 +1,13 @@
 /*
- *    SPDX-License-Identifier: GPL-3.0-or-later
- *    SPDX-FileCopyrightText: 2025 Denys Madureira <denysmb@zoho.com>
- *    SPDX-FileCopyrightText: 2025 Thomas Duckworth <tduck@filotimoproject.org>
+ *   SPDX-License-Identifier: GPL-3.0-or-later
+ *   SPDX-FileCopyrightText: 2025 Denys Madureira <denysmb@zoho.com>
+ *   SPDX-FileCopyrightText: 2025 Thomas Duckworth <tduck@filotimoproject.org>
  */
 
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as Controls
 import QtQuick.Dialogs
-
 import org.kde.kirigami as Kirigami
 
 Kirigami.Dialog {
@@ -90,6 +89,7 @@ Kirigami.Dialog {
         nameField.text = "";
         argsField.text = "";
         imageSearchQuery = "";
+        initCheckbox.checked = false;
 
         if (availableImages && availableImages.length > 0) {
             selectedImageFull = availableImages[0].full;
@@ -149,6 +149,14 @@ Kirigami.Dialog {
         }
     }
 
+    function getFullArgs() {
+        var fullArgs = argsField.text.trim();
+        if (initCheckbox.checked) {
+            fullArgs += (fullArgs.length > 0 ? " " : "") + "--init --additional-packages \"systemd\"";
+        }
+        return fullArgs;
+    }
+
     function startCreation() {
         if (isCreating) {
             return;
@@ -157,7 +165,7 @@ Kirigami.Dialog {
         var imageName = selectedImageFull || selectedImageDisplay;
 
         if (nameField.text && imageName) {
-            console.log("Creating container:", nameField.text, imageName, argsField.text);
+            console.log("Creating container:", nameField.text, imageName, getFullArgs());
             selectingImage = false;
             isCreating = true;
 
@@ -176,10 +184,9 @@ Kirigami.Dialog {
         onTriggered: {
             var imageName = selectedImageFull || selectedImageDisplay;
 
-            var success = distroBoxManager.createContainer(nameField.text, imageName, argsField.text);
+            var success = distroBoxManager.createContainer(nameField.text, imageName, getFullArgs());
 
             if (success) {
-                // Refresh the container list after creation
                 createDialog.pendingContainerName = nameField.text ? nameField.text.trim() : "";
                 var result = distroBoxManager.listContainers();
                 var containers = [];
@@ -333,6 +340,14 @@ Kirigami.Dialog {
                     placeholderText: i18n("--home /path/to/home (optional)")
                     Layout.fillWidth: true
                 }
+
+                Controls.CheckBox {
+                    id: initCheckbox
+                    Kirigami.FormData.label: i18n("Additional Options")
+                    text: i18n("Enable systemd init support")
+                    checked: false
+                    enabled: !createDialog.isCreating
+                }
             }
 
             Kirigami.InlineMessage {
@@ -359,7 +374,10 @@ Kirigami.Dialog {
 
                 Controls.Label {
                     Layout.fillWidth: true
-                    text: "distrobox create --name " + (nameField.text || "…") + " --image " + (selectedImageFull || selectedImageDisplay || "…") + (argsField.text ? " " + argsField.text : "") + " --yes"
+                    text: "distrobox create --name " +
+                    (nameField.text || "…") + " --image " +
+                    (selectedImageFull || selectedImageDisplay || "…") +
+                    (getFullArgs().length > 0 ? " " + getFullArgs() : "") + " --yes"
                     wrapMode: Text.Wrap
                     font.family: "monospace"
                     font.italic: true
